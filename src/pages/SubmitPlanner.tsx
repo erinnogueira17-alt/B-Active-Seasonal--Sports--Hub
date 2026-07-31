@@ -1,8 +1,9 @@
 import { useState } from "react";
-import { Pencil, Trash2, Check, X, Plus } from "lucide-react";
+import { Pencil, Trash2, Check, X, Plus, Link2, Upload, FileCheck2 } from "lucide-react";
 import { trpc } from "../lib/trpc";
 import { useAuth } from "../lib/useAuth";
 import { useToast } from "../components/Toast";
+import { uploadToBlob } from "../lib/blobUpload";
 import { getWindowStatus, submissionWeekDate } from "../lib/plannerWindow";
 import { formatDate, type Term } from "../lib/utils";
 import { Loading, PageContainer, PageHeader } from "../components/ui";
@@ -57,17 +58,44 @@ function SubmitFormCard({ term, weekDate, sunday, monday }: { term: Term; weekDa
   const { toast } = useToast();
   const coaches = trpc.coaches.list.useQuery({ term });
   const [coachName, setCoachName] = useState("");
+  const [mode, setMode] = useState<"link" | "file">("link");
   const [plannerUrl, setPlannerUrl] = useState("");
+  const [uploadedName, setUploadedName] = useState<string | null>(null);
+  const [uploading, setUploading] = useState(false);
   const [result, setResult] = useState<string | null>(null);
 
   const submit = trpc.planner.submit.useMutation({
     onSuccess: (res) => {
       setResult(res.awarded ? "✅ Submitted! +2 points awarded" : "✅ Updated — no additional points (already submitted this week)");
       setPlannerUrl("");
+      setUploadedName(null);
       toast(res.awarded ? "+2 points awarded!" : "Planner updated");
     },
     onError: (e) => toast(e.message, "error"),
   });
+
+  const switchMode = (m: "link" | "file") => {
+    setMode(m);
+    setPlannerUrl("");
+    setUploadedName(null);
+  };
+
+  const handleFile = async (file: File | undefined) => {
+    if (!file) return;
+    setUploading(true);
+    try {
+      const { url } = await uploadToBlob("planner", file);
+      setPlannerUrl(url);
+      setUploadedName(file.name);
+      toast("File attached — now submit");
+    } catch (e: any) {
+      toast(`Upload failed: ${e?.message ?? "error"}`, "error");
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const canSubmit = !!coachName && !!plannerUrl && !uploading && !submit.isPending;
 
   return (
     <div className="card p-6">
@@ -85,11 +113,47 @@ function SubmitFormCard({ term, weekDate, sunday, monday }: { term: Term; weekDa
               {(coaches.data ?? []).map((c) => <option key={c.id} value={c.name}>{c.name}</option>)}
             </select>
           </div>
+
           <div>
-            <label className="label">Planner URL</label>
-            <input className="input" type="url" placeholder="https://…" value={plannerUrl} onChange={(e) => setPlannerUrl(e.target.value)} required />
+            <label className="label">Your planner</label>
+            {/* Link / file toggle */}
+            <div className="mb-2 inline-flex rounded-lg border border-neutral-200 bg-neutral-100 p-0.5 text-sm">
+              <button type="button" onClick={() => switchMode("link")}
+                className={"flex items-center gap-1.5 rounded-md px-3 py-1.5 font-medium transition-colors " + (mode === "link" ? "bg-white text-neutral-900 shadow-sm" : "text-neutral-500")}>
+                <Link2 className="h-4 w-4" /> Paste link
+              </button>
+              <button type="button" onClick={() => switchMode("file")}
+                className={"flex items-center gap-1.5 rounded-md px-3 py-1.5 font-medium transition-colors " + (mode === "file" ? "bg-white text-neutral-900 shadow-sm" : "text-neutral-500")}>
+                <Upload className="h-4 w-4" /> Upload file
+              </button>
+            </div>
+
+            {mode === "link" ? (
+              <input className="input" type="url" placeholder="https://…" value={plannerUrl}
+                onChange={(e) => setPlannerUrl(e.target.value)} required />
+            ) : uploadedName ? (
+              <div className="flex items-center justify-between gap-2 rounded-md border border-green-200 bg-green-50 px-3 py-2 text-sm text-green-800">
+                <span className="flex min-w-0 items-center gap-2">
+                  <FileCheck2 className="h-4 w-4 shrink-0" />
+                  <span className="truncate">{uploadedName}</span>
+                </span>
+                <button type="button" className="shrink-0 text-neutral-500 hover:text-[#dc2626]" onClick={() => { setPlannerUrl(""); setUploadedName(null); }}>
+                  <X className="h-4 w-4" />
+                </button>
+              </div>
+            ) : (
+              <label className="flex cursor-pointer flex-col items-center justify-center rounded-md border-2 border-dashed border-neutral-300 p-5 text-center text-sm text-neutral-500 hover:border-[#dc2626]">
+                <Upload className="mb-1 h-6 w-6 text-[#dc2626]" />
+                <span className="font-medium">{uploading ? "Uploading…" : "Click to choose a file"}</span>
+                <span className="text-xs">PDF, Word, Excel, PowerPoint or image · max 25 MB</span>
+                <input type="file" className="hidden" disabled={uploading}
+                  accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,image/*"
+                  onChange={(e) => handleFile(e.target.files?.[0])} />
+              </label>
+            )}
           </div>
-          <button type="submit" className="btn-primary w-full" disabled={!coachName || submit.isPending}>
+
+          <button type="submit" className="btn-primary w-full" disabled={!canSubmit}>
             {submit.isPending ? "Submitting…" : "Submit Planner"}
           </button>
           {result && <p className="text-center text-sm font-medium text-green-700">{result}</p>}

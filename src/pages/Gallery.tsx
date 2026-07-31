@@ -27,7 +27,7 @@ function downloadImage(url: string, name: string) {
 }
 
 export function Gallery() {
-  const { isAdmin } = useAuth();
+  const { isAdmin, isAuthed } = useAuth();
   const list = trpc.gallery.list.useQuery();
   const [lightbox, setLightbox] = useState<Photo | null>(null);
 
@@ -46,7 +46,17 @@ export function Gallery() {
     <PageContainer>
       <PageHeader title="Gallery" subtitle="Photos from sessions, fixtures and festivals." />
 
-      {isAdmin && <UploadArea />}
+      {isAuthed ? (
+        <UploadArea />
+      ) : (
+        <div className="card mb-8 flex flex-col items-center gap-2 border-2 border-dashed p-6 text-center text-neutral-500">
+          <Upload className="h-7 w-7 text-[#dc2626]" />
+          <p className="text-sm">
+            <a href="/login" className="font-semibold text-[#dc2626] hover:underline">Sign in</a> to add
+            photos to the gallery.
+          </p>
+        </div>
+      )}
 
       {list.isLoading ? (
         <Loading />

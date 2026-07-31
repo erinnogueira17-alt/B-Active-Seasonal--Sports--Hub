@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { desc, eq } from "drizzle-orm";
 import { TRPCError } from "@trpc/server";
-import { router, publicProcedure, protectedProcedure } from "../trpc.js";
+import { router, publicProcedure, protectedProcedure, adminProcedure } from "../trpc.js";
 import { db } from "../db/index.js";
 import { gallery } from "../db/schema.js";
 import { uploadBase64 } from "../blob.js";
@@ -44,7 +44,8 @@ export const galleryRouter = router({
     }),
 
   // Called by the browser after a direct-to-Blob upload completes.
-  saveUploaded: publicProcedure
+  // Signed-in coaches (and admins) only.
+  saveUploaded: protectedProcedure
     .input(
       z.object({
         url: z.string().url(),
@@ -71,7 +72,7 @@ export const galleryRouter = router({
     return db.select().from(gallery).orderBy(desc(gallery.createdAt));
   }),
 
-  delete: publicProcedure
+  delete: adminProcedure
     .input(z.object({ id: z.number() }))
     .mutation(async ({ input }) => {
       await db.delete(gallery).where(eq(gallery.id, input.id));
