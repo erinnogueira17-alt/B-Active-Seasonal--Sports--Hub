@@ -1,4 +1,5 @@
-import { X, Printer } from "lucide-react";
+import { useRef, useState } from "react";
+import { X, Printer, Image as ImageIcon, FileText } from "lucide-react";
 import type { Result } from "../server/db/schema";
 import { formatDate } from "../lib/utils";
 
@@ -16,7 +17,6 @@ function parseResult(r: string | null): "win" | "loss" | "draw" | "other" {
   if (t.includes("win") || t.startsWith("w")) return "win";
   if (t.includes("loss") || t.includes("lose") || t.startsWith("l")) return "loss";
   if (t.includes("draw") || t.startsWith("d")) return "draw";
-  // Try to infer from a score like "3-1"
   const m = t.match(/(\d+)\s*[-–]\s*(\d+)/);
   if (m) {
     const a = Number(m[1]);
@@ -28,7 +28,21 @@ function parseResult(r: string | null): "win" | "loss" | "draw" | "other" {
   return "other";
 }
 
-function ReportPage({ school, monday, results }: { school: string; monday: Date; results: Result[] }) {
+function safeName(s: string): string {
+  return s.replace(/[^a-zA-Z0-9]+/g, "_").replace(/^_+|_+$/g, "");
+}
+
+function ReportPage({
+  school,
+  monday,
+  results,
+  pageRef,
+}: {
+  school: string;
+  monday: Date;
+  results: Result[];
+  pageRef?: (el: HTMLDivElement | null) => void;
+}) {
   const [start, end] = weekRange(monday);
   const rows = results.filter((r) => {
     const d = new Date(r.date);
@@ -46,14 +60,17 @@ function ReportPage({ school, monday, results }: { school: string; monday: Date;
   ] as const;
 
   return (
-    <div className="print-page mx-auto mb-6 w-[794px] max-w-full bg-white shadow-lg">
-      {/* Header */}
+    <div
+      ref={pageRef}
+      className="print-page mx-auto mb-6 w-[794px] max-w-full bg-white shadow-lg"
+    >
       <div className="flex items-center justify-between bg-neutral-950 px-8 py-6 text-white">
         <div className="flex items-center gap-3">
           <img
             src="/logo.jpg"
             alt="B-Active"
             className="h-12 w-12 rounded object-cover"
+            crossOrigin="anonymous"
             onError={(e) => {
               const t = e.currentTarget;
               t.onerror = null;
@@ -70,7 +87,6 @@ function ReportPage({ school, monday, results }: { school: string; monday: Date;
         </div>
       </div>
 
-      {/* Stat boxes */}
       <div className="grid grid-cols-4 gap-3 px-8 py-5">
         {stats.map(([label, value]) => (
           <div key={label} className="rounded-lg border-2 border-[#f59e0b] p-3 text-center">
@@ -80,7 +96,6 @@ function ReportPage({ school, monday, results }: { school: string; monday: Date;
         ))}
       </div>
 
-      {/* Results table */}
       <div className="px-8 pb-8">
         {rows.length === 0 ? (
           <div className="rounded border border-dashed p-8 text-center text-neutral-400">
@@ -130,23 +145,88 @@ export function ReportView({
   results: Result[];
   onClose: () => void;
 }) {
+  const pageRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const [busy, setBusy] = useState<"jpeg" | "pdf" | null>(null);
+  const single = mondays.length === 1;
+
+  async function downloadJpeg() {
+    const node = pageRefs.current[0];
+    if (!node) return;
+    setBusy("jpeg");
+    try {
+      const { toJpeg } = await import("html-to-image");
+      const dataUrl = await toJpeg(node, { quality: 0.95, backgroundColor: "#ffffff", pixelRatio: 2 });
+      const a = document.createElement("a");
+      a.href = dataUrl;
+      a.download = `${safeName(school)}_Weekly_Results_Roundup.jpg`;
+      a.click();
+    } finally {
+      setBusy(null);
+    }
+  }
+
+  async function downloadPdf() {
+    setBusy("pdf");
+    try {
+      const [{ toJpeg }, { jsPDF }] = await Promise.all([
+        import("html-to-image"),
+        import("jspdf"),
+      ]);
+      const pdf = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
+      const pageW = pdf.internal.pageSize.getWidth();
+      const pageH = pdf.internal.pageSize.getHeight();
+      let first = true;
+      for (let i = 0; i < mondays.length; i++) {
+        const node = pageRefs.current[i];
+        if (!node) continue;
+        const dataUrl = await toJpeg(node, { quality: 0.95, backgroundColor: "#ffffff", pixelRatio: 2 });
+        if (!first) pdf.addPage();
+        first = false;
+        // Fit image width to the page, preserving aspect ratio.
+        const imgProps = pdf.getImageProperties(dataUrl);
+        const h = (imgProps.height * pageW) / imgProps.width;
+        pdf.addImage(dataUrl, "JPEG", 0, 0, pageW, Math.min(h, pageH));
+      }
+      const label = single
+        ? `${safeName(school)}_Weekly_Results`
+        : `${safeName(school)}_Results_${mondays.length}_Weeks`;
+      pdf.save(`${label}.pdf`);
+    } finally {
+      setBusy(null);
+    }
+  }
+
   return (
     <div className="fixed inset-0 z-50 overflow-auto bg-neutral-200 p-6">
-      <div className="no-print mx-auto mb-4 flex w-[794px] max-w-full items-center justify-between">
+      <div className="no-print mx-auto mb-4 flex w-[794px] max-w-full flex-wrap items-center justify-between gap-2">
         <div className="font-semibold text-neutral-700">
           {school} — {mondays.length} week{mondays.length > 1 ? "s" : ""}
         </div>
-        <div className="flex gap-2">
-          <button className="btn-primary" onClick={() => window.print()}>
-            <Printer className="h-4 w-4" /> Print / Save PDF
+        <div className="flex flex-wrap gap-2">
+          {single && (
+            <button className="btn-gold" onClick={downloadJpeg} disabled={busy !== null}>
+              <ImageIcon className="h-4 w-4" /> {busy === "jpeg" ? "Rendering…" : "Download JPEG"}
+            </button>
+          )}
+          <button className="btn-primary" onClick={downloadPdf} disabled={busy !== null}>
+            <FileText className="h-4 w-4" /> {busy === "pdf" ? "Rendering…" : "Download PDF"}
           </button>
-          <button className="btn-outline" onClick={onClose}>
+          <button className="btn-outline" onClick={() => window.print()} disabled={busy !== null}>
+            <Printer className="h-4 w-4" /> Print
+          </button>
+          <button className="btn-outline" onClick={onClose} disabled={busy !== null}>
             <X className="h-4 w-4" /> Close
           </button>
         </div>
       </div>
-      {mondays.map((m) => (
-        <ReportPage key={m.toISOString()} school={school} monday={m} results={results} />
+      {mondays.map((m, i) => (
+        <ReportPage
+          key={m.toISOString()}
+          school={school}
+          monday={m}
+          results={results}
+          pageRef={(el) => (pageRefs.current[i] = el)}
+        />
       ))}
     </div>
   );
