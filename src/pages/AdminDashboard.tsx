@@ -1,5 +1,5 @@
 import { Link } from "wouter";
-import { Users, Trophy, ScrollText, ClipboardList, BookOpen, Calendar, TrendingUp, Camera } from "lucide-react";
+import { Users, Trophy, ScrollText, ClipboardList, BookOpen, Calendar, TrendingUp, Camera, LifeBuoy } from "lucide-react";
 import { useAuth } from "../lib/useAuth";
 import { AdminOnly } from "../components/Guards";
 import { PageContainer } from "../components/ui";
@@ -13,6 +13,7 @@ const CARDS = [
   { title: "Manage Calendar", icon: Calendar, href: "/manage-events" },
   { title: "Planner Analytics", icon: TrendingUp, href: "/planner-analytics" },
   { title: "Gallery", icon: Camera, href: "/gallery" },
+  { title: "Term Maintenance Guide", icon: LifeBuoy, href: "/maintenance-guide" },
 ];
 
 export function AdminDashboard() {

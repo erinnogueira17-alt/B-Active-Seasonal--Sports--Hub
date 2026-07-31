@@ -21,6 +21,7 @@ const ADMIN_LINKS = [
   ["/manage-resources", "Resources+"],
   ["/manage-coaches", "Coaches"],
   ["/planner-analytics", "Analytics"],
+  ["/maintenance-guide", "Guide"],
 ];
 
 export function Nav() {
