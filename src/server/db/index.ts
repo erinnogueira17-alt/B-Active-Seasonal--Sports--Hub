@@ -8,11 +8,16 @@ let _db: NeonHttpDatabase<typeof schema> | null = null;
 
 function getDb(): NeonHttpDatabase<typeof schema> {
   if (_db) return _db;
-  const connectionString = process.env.DATABASE_URL;
+  // Accept whichever variable Vercel's Postgres/Neon integration created.
+  const connectionString =
+    process.env.DATABASE_URL ||
+    process.env.POSTGRES_URL ||
+    process.env.DATABASE_POSTGRES_URL ||
+    process.env.POSTGRES_PRISMA_URL;
   if (!connectionString) {
     throw new Error(
-      "DATABASE_URL is not set. Add a Vercel Postgres store to your project, " +
-        "or set DATABASE_URL in your local .env file.",
+      "No Postgres connection string found. Expected DATABASE_URL (or POSTGRES_URL). " +
+        "Add a Vercel Postgres store to your project, or set DATABASE_URL in your local .env.",
     );
   }
   const sql = neon(connectionString);
