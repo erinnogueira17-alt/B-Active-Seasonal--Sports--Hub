@@ -1,6 +1,6 @@
 import { and, eq } from "drizzle-orm";
-import { db as defaultDb } from "../db/index.js";
-import { liveLog, pointsHistory } from "../db/schema.js";
+import { db as defaultDb } from "../db/index";
+import { liveLog, pointsHistory } from "../db/schema";
 
 type Term = "term1" | "term2" | "term3" | "term4";
 type Db = typeof defaultDb;

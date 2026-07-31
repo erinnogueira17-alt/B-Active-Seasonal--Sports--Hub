@@ -1,10 +1,10 @@
 import { z } from "zod";
 import { desc, eq } from "drizzle-orm";
 import { TRPCError } from "@trpc/server";
-import { router, publicProcedure, protectedProcedure } from "../trpc.js";
-import { db } from "../db/index.js";
-import { gallery } from "../db/schema.js";
-import { uploadBase64 } from "../blob.js";
+import { router, publicProcedure, protectedProcedure } from "../trpc";
+import { db } from "../db/index";
+import { gallery } from "../db/schema";
+import { uploadBase64 } from "../blob";
 
 const MAX_IMAGE_BYTES = 10 * 1024 * 1024; // 10 MB
 

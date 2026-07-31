@@ -7,7 +7,7 @@
  * (see vite.config.ts). Run with:  npm run dev:api
  */
 import "dotenv/config";
-import app from "./api/index.ts";
+import app from "./api/index";
 
 const port = Number(process.env.PORT ?? 3000);
 app.listen(port, () => {

@@ -1,16 +1,16 @@
-import { router } from "../trpc.js";
-import { authRouter } from "./auth.js";
-import { resultsRouter } from "./results.js";
-import { allocationsRouter } from "./allocations.js";
-import { resourcesRouter } from "./resources.js";
-import { galleryRouter } from "./gallery.js";
-import { liveLogRouter } from "./liveLog.js";
-import { eventsRouter } from "./events.js";
-import { coachesRouter } from "./coaches.js";
-import { plannerRouter } from "./planner.js";
-import { pointsHistoryRouter } from "./pointsHistory.js";
-import { schoolsRouter } from "./schools.js";
-import { settingsRouter } from "./settings.js";
+import { router } from "../trpc";
+import { authRouter } from "./auth";
+import { resultsRouter } from "./results";
+import { allocationsRouter } from "./allocations";
+import { resourcesRouter } from "./resources";
+import { galleryRouter } from "./gallery";
+import { liveLogRouter } from "./liveLog";
+import { eventsRouter } from "./events";
+import { coachesRouter } from "./coaches";
+import { plannerRouter } from "./planner";
+import { pointsHistoryRouter } from "./pointsHistory";
+import { schoolsRouter } from "./schools";
+import { settingsRouter } from "./settings";
 
 export const appRouter = router({
   auth: authRouter,

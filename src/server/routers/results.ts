@@ -1,8 +1,8 @@
 import { z } from "zod";
 import { desc, eq } from "drizzle-orm";
-import { router, publicProcedure, adminProcedure } from "../trpc.js";
-import { db } from "../db/index.js";
-import { results } from "../db/schema.js";
+import { router, publicProcedure, adminProcedure } from "../trpc";
+import { db } from "../db/index";
+import { results } from "../db/schema";
 
 export const resultsRouter = router({
   submit: publicProcedure

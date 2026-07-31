@@ -2,9 +2,9 @@ import { initTRPC, TRPCError } from "@trpc/server";
 import type { CreateExpressContextOptions } from "@trpc/server/adapters/express";
 import superjson from "superjson";
 import { eq } from "drizzle-orm";
-import { db } from "./db/index.js";
-import { users, type User } from "./db/schema.js";
-import { readSessionCookie, verifySession } from "./auth.js";
+import { db } from "./db/index";
+import { users, type User } from "./db/schema";
+import { readSessionCookie, verifySession } from "./auth";
 
 export interface Context {
   user: User | null;

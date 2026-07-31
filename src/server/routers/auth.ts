@@ -1,16 +1,16 @@
 import { z } from "zod";
 import { eq, sql } from "drizzle-orm";
 import { TRPCError } from "@trpc/server";
-import { router, publicProcedure } from "../trpc.js";
-import { db } from "../db/index.js";
-import { users, type User } from "../db/schema.js";
+import { router, publicProcedure } from "../trpc";
+import { db } from "../db/index";
+import { users, type User } from "../db/schema";
 import {
   hashPassword,
   verifyPassword,
   signSession,
   buildSessionCookie,
   buildClearCookie,
-} from "../auth.js";
+} from "../auth";
 
 function publicUser(u: User) {
   const { passwordHash, ...rest } = u;

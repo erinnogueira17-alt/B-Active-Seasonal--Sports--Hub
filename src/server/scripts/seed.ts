@@ -1,7 +1,7 @@
 import "dotenv/config";
 import { sql } from "drizzle-orm";
-import { db } from "../db/index.js";
-import { coaches, schools, allocations, liveLog, siteSettings } from "../db/schema.js";
+import { db } from "../db/index";
+import { coaches, schools, allocations, liveLog, siteSettings } from "../db/schema";
 
 const TERM3_COACHES = [
   "Abbey", "Akimi", "Azande", "Bahle", "Breyton", "Busani", "Daniel", "Deon",
