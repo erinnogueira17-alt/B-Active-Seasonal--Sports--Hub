@@ -51,7 +51,7 @@ function ReportPage({ school, monday, results }: { school: string; monday: Date;
       <div className="flex items-center justify-between bg-neutral-950 px-8 py-6 text-white">
         <div className="flex items-center gap-3">
           <img
-            src="/logo.png"
+            src="/logo.jpg"
             alt="B-Active"
             className="h-12 w-12 rounded object-cover"
             onError={(e) => {

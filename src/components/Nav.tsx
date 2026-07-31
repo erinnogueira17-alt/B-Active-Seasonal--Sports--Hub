@@ -55,7 +55,7 @@ export function Nav() {
       <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3">
         <Link href="/" className="flex items-center gap-2" onClick={() => setOpen(false)}>
           <img
-            src="/logo.png"
+            src="/logo.jpg"
             alt="B-Active"
             className="h-9 w-9 rounded object-cover"
             onError={(e) => {

@@ -10,12 +10,12 @@ import { PageContainer } from "../components/ui";
 function HeroBrand() {
   const [ok, setOk] = useState(true);
   if (!ok) {
-    // Fallback until the branded tile is uploaded to /public/logo.png
+    // Fallback until the branded tile is uploaded to /public/logo.jpg
     return <h1 className="heading text-4xl leading-tight md:text-6xl">Seasonal Sports Hub</h1>;
   }
   return (
     <img
-      src="/logo.png"
+      src="/logo.jpg"
       alt="B-Active Seasonal Sports"
       className="mx-auto w-72 max-w-[80%] rounded-2xl shadow-2xl ring-1 ring-white/10"
       onError={() => setOk(false)}
