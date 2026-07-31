@@ -54,7 +54,16 @@ export function Nav() {
     <header className="no-print sticky top-0 z-40 border-b-2 border-[#f59e0b] bg-neutral-950">
       <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3">
         <Link href="/" className="flex items-center gap-2" onClick={() => setOpen(false)}>
-          <img src="/logo.svg" alt="B-Active" className="h-9 w-9" />
+          <img
+            src="/logo.png"
+            alt="B-Active"
+            className="h-9 w-9 rounded object-cover"
+            onError={(e) => {
+              const t = e.currentTarget;
+              t.onerror = null;
+              t.src = "/logo.svg";
+            }}
+          />
           <span className="heading hidden text-white sm:block">Seasonal Sports Hub</span>
         </Link>
 

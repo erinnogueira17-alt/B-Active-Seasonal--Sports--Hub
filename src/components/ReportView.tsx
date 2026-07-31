@@ -50,7 +50,16 @@ function ReportPage({ school, monday, results }: { school: string; monday: Date;
       {/* Header */}
       <div className="flex items-center justify-between bg-neutral-950 px-8 py-6 text-white">
         <div className="flex items-center gap-3">
-          <img src="/logo.svg" alt="B-Active" className="h-12 w-12" />
+          <img
+            src="/logo.png"
+            alt="B-Active"
+            className="h-12 w-12 rounded object-cover"
+            onError={(e) => {
+              const t = e.currentTarget;
+              t.onerror = null;
+              t.src = "/logo.svg";
+            }}
+          />
           <div className="heading text-xl">B-Active</div>
         </div>
         <div className="text-right">

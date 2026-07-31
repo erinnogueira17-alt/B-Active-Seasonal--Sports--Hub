@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Link } from "wouter";
 import { Trophy, ClipboardList, BookOpen, ScrollText, Camera, Eye, EyeOff } from "lucide-react";
 import { trpc } from "../lib/trpc";
@@ -5,6 +6,22 @@ import { useAuth } from "../lib/useAuth";
 import { useToast } from "../components/Toast";
 import { EventsCalendar } from "../components/EventsCalendar";
 import { PageContainer } from "../components/ui";
+
+function HeroBrand() {
+  const [ok, setOk] = useState(true);
+  if (!ok) {
+    // Fallback until the branded tile is uploaded to /public/logo.png
+    return <h1 className="heading text-4xl leading-tight md:text-6xl">Seasonal Sports Hub</h1>;
+  }
+  return (
+    <img
+      src="/logo.png"
+      alt="B-Active Seasonal Sports"
+      className="mx-auto w-72 max-w-[80%] rounded-2xl shadow-2xl ring-1 ring-white/10"
+      onError={() => setOk(false)}
+    />
+  );
+}
 
 const FEATURES = [
   { href: "/results", icon: Trophy, title: "Weekly Results", desc: "Submit and review match results across every school." },
@@ -45,9 +62,9 @@ export function Home() {
           }}
         />
         <div className="absolute inset-0 bg-gradient-to-t from-neutral-950 via-neutral-950/70 to-neutral-950/40" />
-        <div className="relative mx-auto max-w-6xl px-4 py-24 text-center md:py-32">
-          <h1 className="heading text-4xl leading-tight md:text-6xl">Seasonal Sports Hub</h1>
-          <p className="mx-auto mt-4 max-w-2xl text-lg italic text-white/80">
+        <div className="relative mx-auto max-w-6xl px-4 py-20 text-center md:py-28">
+          <HeroBrand />
+          <p className="mx-auto mt-6 max-w-2xl text-lg italic text-white/80">
             “Great things in sport are never done by one person — they're done by a team.”
           </p>
           <div className="mt-8 flex flex-wrap justify-center gap-3">
