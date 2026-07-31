@@ -9,7 +9,9 @@ export function useAuth() {
     user,
     isLoading: meQuery.isLoading,
     isAdmin: user?.role === "admin",
+    isCoach: !!user && user.role !== "admin",
     isAuthed: !!user,
+    adminRequested: !!user && (user as { adminRequested?: boolean }).adminRequested === true,
     refetch: meQuery.refetch,
   };
 }

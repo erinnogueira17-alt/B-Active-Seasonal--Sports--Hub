@@ -91,32 +91,26 @@ function getCurrentTerm() { return "term3"; }  // the active term`}</CodeBlock>
         </ul>
       </Section>
 
-      <Section n={3} icon={ShieldPlus} title="Coach accounts & approvals">
+      <Section n={3} icon={ShieldPlus} title="Accounts, coaches & admins">
         <p>
-          Coaches need an account to upload photos to the gallery. They sign up on the site (Sign in →{" "}
-          <strong>Create account</strong>), then <strong>you approve them</strong>:
+          Everyone signs in — the login screen has two tabs, <strong>Coach</strong> and{" "}
+          <strong>Admin</strong>. Coaches create their own account and can use all coach-facing pages straight
+          away. Admins are the management team (the backend); a coach becomes an admin only when an existing
+          admin approves them.
         </p>
-        <ul className="ml-5 list-disc space-y-1 text-neutral-700">
+        <p className="font-medium">Approving / adding admins — Admin → <A href="/manage-accounts">Team &amp; Accounts</A>:</p>
+        <ol className="ml-5 list-decimal space-y-1 text-neutral-700">
+          <li>A coach signs in, then clicks <strong>Request admin access</strong> on the home page.</li>
           <li>
-            Go to Admin → <A href="/manage-accounts">Coach Accounts</A> (the dashboard also shows a gold
-            banner when someone is waiting).
+            Their request appears under <strong>Admin access requests</strong> — click{" "}
+            <strong>Approve as admin</strong>. (You can also <strong>Make admin</strong> on any coach directly.)
           </li>
           <li>
-            <strong>Approve</strong> to let them in, or <strong>Reject</strong> to delete the request.
+            To remove an admin, use <strong>Make coach</strong>. You can't change your own role, so there's
+            always at least one admin. <strong>Remove</strong> deletes a coach account.
           </li>
-          <li>
-            Until approved, a new account <strong>cannot sign in</strong> and <strong>cannot see the admin
-            panel</strong> — approval only grants normal coach access.
-          </li>
-          <li>
-            Use <strong>Make admin</strong> / <strong>Make coach</strong> to change someone's role, or{" "}
-            <strong>Suspend</strong> to re-lock an account without deleting it.
-          </li>
-        </ul>
-        <Callout>
-          Planner file uploads are open to <strong>all</strong> coaches and need no account — only the gallery
-          requires a signed-in, approved account.
-        </Callout>
+        </ol>
+        <Callout>Coaches can never see the admin panel — only admins can.</Callout>
       </Section>
 
       <Section n={4} icon={CalendarDays} title="Calendar, results, reports, resources">
@@ -173,7 +167,7 @@ function getCurrentTerm() { return "term3"; }  // the active term`}</CodeBlock>
             <Code>dedupe-resources.sql</Code> — remove duplicate curated links (if seeded twice)
           </li>
           <li>
-            <Code>add-account-approval.sql</Code> — one-time: adds the account-approval flag
+            <Code>add-admin-requests.sql</Code> — one-time: team model (admin-request flag)
           </li>
         </ul>
       </Section>

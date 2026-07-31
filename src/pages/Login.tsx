@@ -1,17 +1,20 @@
 import { useState } from "react";
 import { useLocation } from "wouter";
+import { ShieldCheck, Users } from "lucide-react";
 import { trpc } from "../lib/trpc";
 import { useAuth } from "../lib/useAuth";
 import { useToast } from "../components/Toast";
 import { PageContainer } from "../components/ui";
 
+type Portal = "coach" | "admin";
+
 export function Login() {
+  const [portal, setPortal] = useState<Portal>("coach");
   const [mode, setMode] = useState<"login" | "register">("login");
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [, navigate] = useLocation();
-  const [notice, setNotice] = useState<string | null>(null);
   const { refetch } = useAuth();
   const utils = trpc.useUtils();
   const { toast } = useToast();
@@ -30,16 +33,7 @@ export function Login() {
     onError: (e) => toast(e.message, "error"),
   });
   const register = trpc.auth.register.useMutation({
-    onSuccess: async (data) => {
-      if (data.pending) {
-        // Pending accounts are not logged in — wait for admin approval.
-        setNotice(
-          "Account created! An admin needs to approve it before you can sign in. You'll be able to log in once approved.",
-        );
-        setMode("login");
-        setPassword("");
-        return;
-      }
+    onSuccess: async () => {
       toast("Account created!");
       await onDone();
     },
@@ -53,33 +47,58 @@ export function Login() {
   };
 
   const busy = login.isPending || register.isPending;
+  // Admins never self-register — they sign in, then are promoted by an admin.
+  const canRegister = portal === "coach";
+  const showRegister = canRegister && mode === "register";
+
+  const switchPortal = (p: Portal) => {
+    setPortal(p);
+    if (p === "admin") setMode("login");
+  };
 
   return (
     <PageContainer className="max-w-md">
-      <div className="card p-8">
-        <div className="mb-6 flex gap-2">
-          <button
-            className={mode === "login" ? "btn-primary flex-1" : "btn-outline flex-1"}
-            onClick={() => setMode("login")}
-          >
-            Sign in
-          </button>
-          <button
-            className={mode === "register" ? "btn-primary flex-1" : "btn-outline flex-1"}
-            onClick={() => setMode("register")}
-          >
-            Create account
-          </button>
-        </div>
+      {/* Portal chooser */}
+      <div className="mb-4 grid grid-cols-2 gap-2">
+        <button
+          onClick={() => switchPortal("coach")}
+          className={"flex items-center justify-center gap-2 rounded-lg border-2 p-3 text-sm font-semibold transition-colors " +
+            (portal === "coach" ? "border-[#dc2626] bg-[#dc2626]/5 text-[#dc2626]" : "border-neutral-200 text-neutral-500 hover:border-neutral-300")}
+        >
+          <Users className="h-4 w-4" /> Coach
+        </button>
+        <button
+          onClick={() => switchPortal("admin")}
+          className={"flex items-center justify-center gap-2 rounded-lg border-2 p-3 text-sm font-semibold transition-colors " +
+            (portal === "admin" ? "border-neutral-900 bg-neutral-900/5 text-neutral-900" : "border-neutral-200 text-neutral-500 hover:border-neutral-300")}
+        >
+          <ShieldCheck className="h-4 w-4" /> Admin
+        </button>
+      </div>
 
-        {notice && (
-          <div className="mb-4 rounded-lg border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-800">
-            {notice}
+      <div className="card p-8">
+        <h1 className="heading mb-1 text-xl">
+          {portal === "admin" ? "Admin sign in" : mode === "login" ? "Coach sign in" : "Create coach account"}
+        </h1>
+        <p className="mb-6 text-sm text-neutral-500">
+          {portal === "admin"
+            ? "For the management team. Coaches should use the Coach tab."
+            : "Sign in to submit results, planners and add photos."}
+        </p>
+
+        {canRegister && (
+          <div className="mb-6 flex gap-2">
+            <button className={mode === "login" ? "btn-primary flex-1" : "btn-outline flex-1"} onClick={() => setMode("login")}>
+              Sign in
+            </button>
+            <button className={mode === "register" ? "btn-primary flex-1" : "btn-outline flex-1"} onClick={() => setMode("register")}>
+              Create account
+            </button>
           </div>
         )}
 
         <form onSubmit={submit} className="space-y-4">
-          {mode === "register" && (
+          {showRegister && (
             <div>
               <label className="label">Full name</label>
               <input className="input" value={name} onChange={(e) => setName(e.target.value)} required />
@@ -87,36 +106,28 @@ export function Login() {
           )}
           <div>
             <label className="label">Email</label>
-            <input
-              className="input"
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-            />
+            <input className="input" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
           </div>
           <div>
             <label className="label">Password</label>
-            <input
-              className="input"
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              minLength={8}
-              required
-            />
-            {mode === "register" && (
-              <p className="mt-1 text-xs text-neutral-500">At least 8 characters.</p>
-            )}
+            <input className="input" type="password" value={password} onChange={(e) => setPassword(e.target.value)} minLength={8} required />
+            {showRegister && <p className="mt-1 text-xs text-neutral-500">At least 8 characters.</p>}
           </div>
           <button type="submit" className="btn-primary w-full" disabled={busy}>
             {busy ? "Please wait…" : mode === "login" ? "Sign in" : "Create account"}
           </button>
         </form>
 
-        <p className="mt-4 text-center text-xs text-neutral-500">
-          New accounts must be approved by an admin before you can sign in.
-        </p>
+        {portal === "admin" ? (
+          <p className="mt-4 text-center text-xs text-neutral-500">
+            Need admin access? Sign in as a coach first, then request it from the home page — an existing
+            admin approves you.
+          </p>
+        ) : (
+          <p className="mt-4 text-center text-xs text-neutral-500">
+            Anyone on the coaching team can create an account.
+          </p>
+        )}
       </div>
     </PageContainer>
   );

@@ -6,7 +6,7 @@ import { AdminOnly } from "../components/Guards";
 import { PageContainer } from "../components/ui";
 
 const CARDS = [
-  { title: "Coach Accounts", icon: UserCheck, href: "/manage-accounts" },
+  { title: "Team & Accounts", icon: UserCheck, href: "/manage-accounts" },
   { title: "Manage Coaches", icon: Users, href: "/manage-coaches" },
   { title: "Results & Reports", icon: Trophy, href: "/results" },
   { title: "Seasonal Log", icon: ScrollText, href: "/log" },
@@ -29,7 +29,9 @@ export function AdminDashboard() {
 function Inner() {
   const { user } = useAuth();
   const usersQuery = trpc.auth.listUsers.useQuery();
-  const pendingCount = (usersQuery.data ?? []).filter((u) => !u.approved).length;
+  const pendingCount = (usersQuery.data ?? []).filter(
+    (u) => u.role !== "admin" && (u as { adminRequested?: boolean }).adminRequested,
+  ).length;
 
   return (
     <PageContainer>
@@ -47,7 +49,7 @@ function Inner() {
         >
           <Clock className="h-5 w-5 shrink-0" />
           <span className="font-medium">
-            {pendingCount} coach account{pendingCount > 1 ? "s" : ""} awaiting approval — review now →
+            {pendingCount} admin access request{pendingCount > 1 ? "s" : ""} — review now →
           </span>
         </Link>
       )}

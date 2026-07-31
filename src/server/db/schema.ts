@@ -43,8 +43,9 @@ export const users = pgTable("users", {
   passwordHash: text("password_hash").notNull(),
   loginMethod: varchar("login_method", { length: 50 }).default("password"),
   role: roleEnum("role").notNull().default("user"),
-  // New accounts must be approved by an admin before they can sign in / upload.
-  approved: boolean("approved").notNull().default(false),
+  // Coaches self-serve. Becoming an admin needs approval by an existing admin;
+  // this flags a coach who has requested admin access (shows in the admin queue).
+  adminRequested: boolean("admin_requested").notNull().default(false),
   createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
   updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow(),
   lastSignedIn: timestamp("last_signed_in", { withTimezone: true }),

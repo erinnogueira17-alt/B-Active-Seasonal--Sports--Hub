@@ -49,24 +49,25 @@ submissions close with a "season ended" message.
 
 ---
 
-## 3. Coach accounts & approvals
+## 3. Accounts, coaches & admins
 
-Coaches need an account to upload photos to the gallery. They sign up on the
-site (Sign in → **Create account**), then **you approve them**:
+Everyone signs in — the login screen has two tabs, **Coach** and **Admin**.
 
-- Go to Admin → **Coach Accounts** (the dashboard also shows a gold banner when
-  someone is waiting).
-- **Approve** to let them in, or **Reject** to delete the request.
-- Until approved, a new account **cannot sign in** and **cannot see the admin
-  panel** — approval only grants normal coach access (uploading photos,
-  attaching planner files).
+- **Coaches** create their own account (Coach → Create account) and can use all
+  coach-facing pages straight away. No approval needed.
+- **Admins** are the management team (the backend). A coach becomes an admin
+  only when an existing admin approves them.
 
-**Make someone an admin:** on the same page, use **Make admin** (or **Make
-coach** to remove it). You can't change your own role, so there's always at
-least one admin. Suspend re-locks an account without deleting it.
+**Approving / adding admins** — Admin → **Team & Accounts** (the dashboard shows
+a gold banner when someone requests admin):
 
-> Planner file uploads are open to all coaches and need no account — only the
-> gallery requires a signed-in, approved account.
+1. A coach signs in, then clicks **Request admin access** on the home page.
+2. Their request appears under **Admin access requests** — click
+   **Approve as admin**. (You can also **Make admin** on any coach directly.)
+3. To remove an admin, use **Make coach**. You can't change your own role, so
+   there's always at least one admin. **Remove** deletes a coach account.
+
+> Coaches can never see the admin panel — only admins can.
 
 ---
 
@@ -100,7 +101,7 @@ Reusable SQL files live in the `db/` folder of the repo:
 - `migrate-results.sql` — results history
 - `resources-seed.sql` — curated official coaching/refereeing links
 - `dedupe-resources.sql` — remove duplicate curated links (if seeded twice)
-- `add-account-approval.sql` — one-time: adds the account-approval flag
+- `add-admin-requests.sql` — one-time: team model (admin-request flag)
 
 ---
 

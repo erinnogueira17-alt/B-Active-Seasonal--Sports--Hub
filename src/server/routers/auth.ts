@@ -1,7 +1,7 @@
 import { z } from "zod";
-import { eq, sql, desc, asc } from "drizzle-orm";
+import { eq, sql, desc } from "drizzle-orm";
 import { TRPCError } from "@trpc/server";
-import { router, publicProcedure, adminProcedure } from "../trpc.js";
+import { router, publicProcedure, protectedProcedure, adminProcedure } from "../trpc.js";
 import { db } from "../db/index.js";
 import { users, type User } from "../db/schema.js";
 import {
@@ -44,9 +44,8 @@ export const authRouter = router({
         });
       }
 
-      // The very first account, or one matching ADMIN_EMAIL, becomes an
-      // approved admin. Everyone else starts as a pending coach account that
-      // an admin must approve before it can sign in.
+      // The very first account, or one matching ADMIN_EMAIL, becomes an admin.
+      // Everyone else is a coach with immediate access (no approval needed).
       const [{ count }] = await db
         .select({ count: sql<number>`count(*)::int` })
         .from(users);
@@ -63,19 +62,15 @@ export const authRouter = router({
           email,
           passwordHash,
           role: bootstrapAdmin ? "admin" : "user",
-          approved: bootstrapAdmin,
           loginMethod: "password",
-          lastSignedIn: bootstrapAdmin ? new Date() : null,
+          lastSignedIn: new Date(),
         })
         .returning();
 
       const user = inserted[0];
-      // Only log the user in immediately if they're already approved (the
-      // bootstrap admin). Pending coaches must wait for approval.
-      if (user.approved) {
-        ctx.res.setHeader("Set-Cookie", buildSessionCookie(signSession(user.id)));
-      }
-      return { ...publicUser(user), pending: !user.approved };
+      // Log them in straight away — coaches are active immediately.
+      ctx.res.setHeader("Set-Cookie", buildSessionCookie(signSession(user.id)));
+      return publicUser(user);
     }),
 
   login: publicProcedure
@@ -99,12 +94,6 @@ export const authRouter = router({
           message: "Invalid email or password.",
         });
       }
-      if (!user.approved && user.role !== "admin") {
-        throw new TRPCError({
-          code: "FORBIDDEN",
-          message: "Your account is awaiting admin approval.",
-        });
-      }
       await db
         .update(users)
         .set({ lastSignedIn: new Date() })
@@ -118,43 +107,50 @@ export const authRouter = router({
     return { success: true };
   }),
 
-  // ── Admin: manage coach accounts ──────────────────────────────
+  // A signed-in coach asks to become an admin. An existing admin then approves
+  // (promotes) them from the Team page.
+  requestAdmin: protectedProcedure.mutation(async ({ ctx }) => {
+    if (ctx.user.role === "admin") {
+      return { success: true, alreadyAdmin: true };
+    }
+    await db
+      .update(users)
+      .set({ adminRequested: true, updatedAt: new Date() })
+      .where(eq(users.id, ctx.user.id));
+    return { success: true, alreadyAdmin: false };
+  }),
+
+  // ── Admin: manage the team ────────────────────────────────────
   listUsers: adminProcedure.query(async () => {
     const rows = await db
       .select()
       .from(users)
-      // Pending accounts first, then newest.
-      .orderBy(asc(users.approved), desc(users.createdAt));
+      // Admin requests first, then newest.
+      .orderBy(desc(users.adminRequested), desc(users.createdAt));
     return rows.map(publicUser);
   }),
 
-  setApproved: adminProcedure
-    .input(z.object({ id: z.number(), approved: z.boolean() }))
-    .mutation(async ({ input, ctx }) => {
-      if (input.id === ctx.user.id && !input.approved) {
-        throw new TRPCError({ code: "BAD_REQUEST", message: "You can't revoke your own access." });
-      }
-      await db
-        .update(users)
-        .set({ approved: input.approved, updatedAt: new Date() })
-        .where(eq(users.id, input.id));
-      return { success: true };
-    }),
-
+  // Promote a coach to admin (approve) or demote an admin back to coach.
   setRole: adminProcedure
     .input(z.object({ id: z.number(), role: z.enum(["user", "admin"]) }))
     .mutation(async ({ input, ctx }) => {
       if (input.id === ctx.user.id && input.role !== "admin") {
         throw new TRPCError({ code: "BAD_REQUEST", message: "You can't remove your own admin role." });
       }
-      // Promoting to admin implies approval.
       await db
         .update(users)
-        .set({
-          role: input.role,
-          ...(input.role === "admin" ? { approved: true } : {}),
-          updatedAt: new Date(),
-        })
+        .set({ role: input.role, adminRequested: false, updatedAt: new Date() })
+        .where(eq(users.id, input.id));
+      return { success: true };
+    }),
+
+  // Dismiss a coach's admin request without promoting them.
+  dismissAdminRequest: adminProcedure
+    .input(z.object({ id: z.number() }))
+    .mutation(async ({ input }) => {
+      await db
+        .update(users)
+        .set({ adminRequested: false, updatedAt: new Date() })
         .where(eq(users.id, input.id));
       return { success: true };
     }),

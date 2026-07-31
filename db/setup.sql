@@ -133,7 +133,7 @@ CREATE TABLE "users" (
 	"password_hash" text NOT NULL,
 	"login_method" varchar(50) DEFAULT 'password',
 	"role" "role" DEFAULT 'user' NOT NULL,
-	"approved" boolean DEFAULT false NOT NULL,
+	"admin_requested" boolean DEFAULT false NOT NULL,
 	"created_at" timestamp with time zone DEFAULT now(),
 	"updated_at" timestamp with time zone DEFAULT now(),
 	"last_signed_in" timestamp with time zone,

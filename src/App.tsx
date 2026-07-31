@@ -1,6 +1,8 @@
 import { Route, Switch } from "wouter";
 import { Nav } from "./components/Nav";
 import { InstallPrompt } from "./components/InstallPrompt";
+import { useAuth } from "./lib/useAuth";
+import { Loading } from "./components/ui";
 import { Home } from "./pages/Home";
 import { Allocations } from "./pages/Allocations";
 import { Results } from "./pages/Results";
@@ -21,6 +23,38 @@ import { MaintenanceGuide } from "./pages/MaintenanceGuide";
 import { NotFound } from "./pages/NotFound";
 
 export default function App() {
+  const { isLoading, isAuthed } = useAuth();
+
+  // Whole site requires login — coach or admin. No anonymous access.
+  if (isLoading) {
+    return (
+      <div className="flex min-h-screen items-center justify-center">
+        <Loading />
+      </div>
+    );
+  }
+  if (!isAuthed) {
+    return (
+      <div className="flex min-h-screen flex-col">
+        <header className="no-print border-b-2 border-[#f59e0b] bg-neutral-950">
+          <div className="mx-auto flex max-w-6xl items-center gap-2 px-4 py-3">
+            <img
+              src="/logo.jpg"
+              alt="B-Active"
+              className="h-9 w-9 rounded object-cover"
+              onError={(e) => { const t = e.currentTarget; t.onerror = null; t.src = "/logo.svg"; }}
+            />
+            <span className="heading text-white">Seasonal Sports Hub</span>
+          </div>
+        </header>
+        <main className="flex flex-1 items-start justify-center py-10">
+          <Login />
+        </main>
+        <Footer />
+      </div>
+    );
+  }
+
   return (
     <div className="flex min-h-screen flex-col">
       <Nav />
