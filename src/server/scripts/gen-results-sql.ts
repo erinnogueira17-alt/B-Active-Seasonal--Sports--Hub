@@ -23,8 +23,10 @@ type Row = {
   feedback: string | null;
 };
 
+// Only true null/undefined becomes NULL. Empty strings stay as '' so they
+// don't violate NOT NULL columns (sport, team).
 const q = (s: string | null | undefined): string =>
-  s == null || s === "" ? "NULL" : `'${String(s).replace(/'/g, "''")}'`;
+  s == null ? "NULL" : `'${String(s).replace(/'/g, "''")}'`;
 
 const raw = readFileSync(join(here, "oldResults.jsonl"), "utf8");
 const rows: Row[] = raw
