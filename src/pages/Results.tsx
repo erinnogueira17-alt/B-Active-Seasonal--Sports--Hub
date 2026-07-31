@@ -34,38 +34,69 @@ export function Results() {
         ) : (results.data?.length ?? 0) === 0 ? (
           <EmptyState>No results submitted yet.</EmptyState>
         ) : (
-          <div className="card overflow-x-auto">
-            <table className="w-full text-left text-sm">
-              <thead className="bg-neutral-950 text-white">
-                <tr>
-                  <th className="px-3 py-2">Date</th>
-                  <th className="px-3 py-2">Coach</th>
-                  <th className="px-3 py-2">Sport</th>
-                  <th className="px-3 py-2">School</th>
-                  <th className="px-3 py-2">Opposition</th>
-                  <th className="px-3 py-2">Result</th>
-                  {isAdmin && <th className="px-3 py-2"></th>}
-                </tr>
-              </thead>
-              <tbody>
-                {results.data!.slice(0, 20).map((r) => (
-                  <tr key={r.id} className="border-b last:border-0 hover:bg-neutral-50">
-                    <td className="px-3 py-2 whitespace-nowrap">{formatDate(r.date)}</td>
-                    <td className="px-3 py-2">{r.coachName}</td>
-                    <td className="px-3 py-2">{r.sport}</td>
-                    <td className="px-3 py-2">{r.team}</td>
-                    <td className="px-3 py-2">{r.opposition || "—"}</td>
-                    <td className="px-3 py-2 font-semibold">{r.result || "—"}</td>
-                    {isAdmin && (
-                      <td className="px-3 py-2">
-                        <DeleteResult id={r.id} />
-                      </td>
-                    )}
+          <>
+            {/* Table — small screens and up scroll horizontally; on phones we show cards below */}
+            <div className="card hidden overflow-x-auto sm:block">
+              <table className="w-full text-left text-sm">
+                <thead className="bg-neutral-950 text-white">
+                  <tr>
+                    <th className="px-3 py-2">Date</th>
+                    <th className="px-3 py-2">Coach</th>
+                    <th className="px-3 py-2">Sport</th>
+                    <th className="px-3 py-2">School</th>
+                    <th className="px-3 py-2">Opposition</th>
+                    <th className="px-3 py-2">Result</th>
+                    {isAdmin && <th className="px-3 py-2"></th>}
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                </thead>
+                <tbody>
+                  {results.data!.slice(0, 20).map((r) => (
+                    <tr key={r.id} className="border-b last:border-0 hover:bg-neutral-50">
+                      <td className="px-3 py-2 whitespace-nowrap">{formatDate(r.date)}</td>
+                      <td className="px-3 py-2">{r.coachName}</td>
+                      <td className="px-3 py-2">{r.sport}</td>
+                      <td className="px-3 py-2">{r.team}</td>
+                      <td className="px-3 py-2">{r.opposition || "—"}</td>
+                      <td className="px-3 py-2 font-semibold">{r.result || "—"}</td>
+                      {isAdmin && (
+                        <td className="px-3 py-2">
+                          <DeleteResult id={r.id} />
+                        </td>
+                      )}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            {/* Cards — phones only */}
+            <div className="space-y-3 sm:hidden">
+              {results.data!.slice(0, 20).map((r) => (
+                <div key={r.id} className="card p-4">
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="min-w-0">
+                      <p className="font-semibold text-neutral-900">
+                        {r.sport} · {r.team}
+                      </p>
+                      <p className="text-sm text-neutral-600">{r.coachName}</p>
+                    </div>
+                    <span className="shrink-0 text-xs font-medium text-neutral-500">{formatDate(r.date)}</span>
+                  </div>
+                  <div className="mt-2 flex items-center justify-between gap-2 border-t border-neutral-100 pt-2 text-sm">
+                    <span className="text-neutral-600">
+                      vs {r.opposition || "—"}
+                    </span>
+                    <span className="font-semibold text-neutral-900">{r.result || "—"}</span>
+                  </div>
+                  {isAdmin && (
+                    <div className="mt-2 flex justify-end">
+                      <DeleteResult id={r.id} />
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          </>
         )}
       </div>
     </PageContainer>

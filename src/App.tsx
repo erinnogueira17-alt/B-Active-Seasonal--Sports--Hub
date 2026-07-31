@@ -1,5 +1,6 @@
 import { Route, Switch } from "wouter";
 import { Nav } from "./components/Nav";
+import { InstallPrompt } from "./components/InstallPrompt";
 import { Home } from "./pages/Home";
 import { Allocations } from "./pages/Allocations";
 import { Results } from "./pages/Results";
@@ -44,6 +45,7 @@ export default function App() {
         </Switch>
       </main>
       <Footer />
+      <InstallPrompt />
     </div>
   );
 }

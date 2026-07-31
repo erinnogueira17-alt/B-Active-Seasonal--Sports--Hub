@@ -4,6 +4,7 @@ import { trpc } from "../lib/trpc";
 import { useAuth } from "../lib/useAuth";
 import { useToast } from "../components/Toast";
 import { EventsCalendar } from "../components/EventsCalendar";
+import { QuickDashboard } from "../components/QuickDashboard";
 import { PageContainer } from "../components/ui";
 
 const FEATURES = [
@@ -69,8 +70,11 @@ export function Home() {
       </section>
 
       <PageContainer>
+        {/* At-a-glance dashboard */}
+        <QuickDashboard />
+
         {/* Feature cards */}
-        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {FEATURES.map((f) => (
             <Link key={f.href} href={f.href} className="card group p-6 transition-shadow hover:shadow-md">
               <f.icon className="h-9 w-9 text-[#dc2626]" />

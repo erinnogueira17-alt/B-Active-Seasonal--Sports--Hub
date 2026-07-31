@@ -99,7 +99,7 @@ function PhotoTile({ p, isAdmin, onOpen }: { p: Photo; isAdmin: boolean; onOpen:
     <div className="card group overflow-hidden">
       <div className="relative overflow-hidden bg-neutral-200">
         <img src={p.imageUrl} alt={label} className="h-40 w-full cursor-pointer object-cover" onClick={onOpen} loading="lazy" />
-        <div className="absolute inset-x-0 bottom-0 flex items-center justify-end gap-1 bg-gradient-to-t from-black/60 to-transparent p-1.5 opacity-0 transition-opacity group-hover:opacity-100">
+        <div className="absolute inset-x-0 bottom-0 flex items-center justify-end gap-1 bg-gradient-to-t from-black/60 to-transparent p-1.5 opacity-100 transition-opacity sm:opacity-0 sm:group-hover:opacity-100">
           <button className="rounded bg-white/90 p-1" onClick={() => downloadImage(p.imageUrl, label || "photo")}><Download className="h-4 w-4" /></button>
           {isAdmin && <button className="rounded bg-white/90 p-1" onClick={() => setEditing(true)}><Pencil className="h-4 w-4" /></button>}
           {isAdmin && <button className="rounded bg-white/90 p-1 text-[#dc2626]" onClick={() => { if (confirm("Delete photo?")) del.mutate({ id: p.id }); }}><Trash2 className="h-4 w-4" /></button>}

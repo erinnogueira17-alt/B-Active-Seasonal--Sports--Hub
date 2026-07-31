@@ -42,3 +42,13 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
     <Root />
   </React.StrictMode>,
 );
+
+// Register the service worker so the hub is installable ("Add to Home Screen")
+// and loads fast on repeat visits. Only in production builds.
+if ("serviceWorker" in navigator && import.meta.env.PROD) {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("/sw.js").catch(() => {
+      /* offline/install support is best-effort */
+    });
+  });
+}
