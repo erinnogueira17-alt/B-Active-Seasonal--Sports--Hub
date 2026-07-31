@@ -65,4 +65,14 @@ describe("awardPlannerPoints", () => {
     // Does NOT insert a new liveLog row.
     expect(db.inserts.some((i) => i.table === liveLog)).toBe(false);
   });
+
+  it("records the term and week on the audit history row", async () => {
+    const db = makeMockDb(null);
+    await awardPlannerPoints("Priya", "term4", week, db as any);
+
+    const history = db.inserts.find((i) => i.table === pointsHistory);
+    expect(history?.vals.term).toBe("term4");
+    expect(history?.vals.coachName).toBe("Priya");
+    expect(history?.vals.weekDate).toBe(week);
+  });
 });

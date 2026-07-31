@@ -43,4 +43,23 @@ describe("getWindowStatus", () => {
       expect(status.nextSunday.getDate()).toBe(2);
     }
   });
+
+  it("is open right at midnight on the opening Sunday", () => {
+    const status = getWindowStatus(new Date(2026, 6, 26, 0, 0, 0), true, TERM_START);
+    expect(status.state).toBe("open");
+  });
+
+  it("is closed on Saturday (the day before the window opens)", () => {
+    // 25 July 2026 is a Saturday → next Sunday is the very next day (26th)
+    const status = getWindowStatus(new Date(2026, 6, 25, 23, 0), true, TERM_START);
+    expect(status.state).toBe("closed");
+    if (status.state === "closed") {
+      expect(status.nextSunday.getDate()).toBe(26);
+    }
+  });
+
+  it("season_ended takes priority even before the term starts", () => {
+    const status = getWindowStatus(new Date(2025, 0, 1), false, TERM_START);
+    expect(status.state).toBe("season_ended");
+  });
 });

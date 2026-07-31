@@ -11,6 +11,7 @@ import {
   buildSessionCookie,
   buildClearCookie,
 } from "../auth.js";
+import { isBootstrapAdmin } from "../lib/roles.js";
 
 function publicUser(u: User) {
   const { passwordHash, ...rest } = u;
@@ -49,10 +50,7 @@ export const authRouter = router({
       const [{ count }] = await db
         .select({ count: sql<number>`count(*)::int` })
         .from(users);
-      const bootstrapAdmin =
-        count === 0 ||
-        (!!process.env.ADMIN_EMAIL &&
-          process.env.ADMIN_EMAIL.toLowerCase().trim() === email);
+      const bootstrapAdmin = isBootstrapAdmin(count, process.env.ADMIN_EMAIL, email);
 
       const passwordHash = await hashPassword(input.password);
       const inserted = await db
