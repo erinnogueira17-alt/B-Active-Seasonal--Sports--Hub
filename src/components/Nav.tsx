@@ -55,18 +55,20 @@ export function Nav() {
   return (
     <header className="no-print sticky top-0 z-40 border-b-2 border-[#f59e0b] bg-neutral-950">
       <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3">
-        <Link href="/" className="flex items-center gap-2" onClick={() => setOpen(false)}>
+        <Link href="/" className="flex shrink-0 items-center gap-2" onClick={() => setOpen(false)}>
           <img
             src="/logo.jpg"
             alt="B-Active"
-            className="h-9 w-9 rounded object-cover"
+            className="h-9 w-9 shrink-0 rounded object-cover"
             onError={(e) => {
               const t = e.currentTarget;
               t.onerror = null;
               t.src = "/logo.svg";
             }}
           />
-          <span className="heading hidden text-white sm:block">Seasonal Sports Hub</span>
+          <span className="heading hidden whitespace-nowrap text-base text-white xl:block">
+            Seasonal Sports Hub
+          </span>
         </Link>
 
         <nav className="hidden items-center gap-1 lg:flex">

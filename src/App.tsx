@@ -41,10 +41,10 @@ export default function App() {
             <img
               src="/logo.jpg"
               alt="B-Active"
-              className="h-9 w-9 rounded object-cover"
+              className="h-9 w-9 shrink-0 rounded object-cover"
               onError={(e) => { const t = e.currentTarget; t.onerror = null; t.src = "/logo.svg"; }}
             />
-            <span className="heading text-white">Seasonal Sports Hub</span>
+            <span className="heading whitespace-nowrap text-base text-white sm:text-lg">Seasonal Sports Hub</span>
           </div>
         </header>
         <main className="flex flex-1 items-start justify-center py-10">
