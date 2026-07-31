@@ -7,12 +7,12 @@ import { useToast } from "./Toast";
 import { cn } from "../lib/utils";
 
 const PUBLIC_LINKS = [
+  ["/welcome", "About"],
   ["/allocations", "Allocations"],
   ["/results", "Results"],
   ["/log", "Log"],
   ["/gallery", "Gallery"],
   ["/resources", "Resources"],
-  ["/submit-planner", "Planner"],
   ["/tutorial", "Help"],
 ];
 

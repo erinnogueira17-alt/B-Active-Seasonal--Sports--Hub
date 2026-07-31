@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { Link } from "wouter";
 import { Trophy, ClipboardList, BookOpen, ScrollText, Camera, Eye, EyeOff } from "lucide-react";
 import { trpc } from "../lib/trpc";
@@ -6,22 +5,6 @@ import { useAuth } from "../lib/useAuth";
 import { useToast } from "../components/Toast";
 import { EventsCalendar } from "../components/EventsCalendar";
 import { PageContainer } from "../components/ui";
-
-function HeroBrand() {
-  const [ok, setOk] = useState(true);
-  if (!ok) {
-    // Fallback until the branded tile is uploaded to /public/logo.jpg
-    return <h1 className="heading text-4xl leading-tight md:text-6xl">Seasonal Sports Hub</h1>;
-  }
-  return (
-    <img
-      src="/logo.jpg"
-      alt="B-Active Seasonal Sports"
-      className="mx-auto w-72 max-w-[80%] rounded-2xl shadow-2xl ring-1 ring-white/10"
-      onError={() => setOk(false)}
-    />
-  );
-}
 
 const FEATURES = [
   { href: "/results", icon: Trophy, title: "Weekly Results", desc: "Submit and review match results across every school." },
@@ -62,12 +45,17 @@ export function Home() {
           }}
         />
         <div className="absolute inset-0 bg-gradient-to-t from-neutral-950 via-neutral-950/70 to-neutral-950/40" />
-        <div className="relative mx-auto max-w-6xl px-4 py-20 text-center md:py-28">
-          <HeroBrand />
-          <p className="mx-auto mt-6 max-w-2xl text-lg italic text-white/80">
-            “Great things in sport are never done by one person — they're done by a team.”
+        <div className="relative mx-auto max-w-6xl px-4 py-20 text-left md:py-28">
+          <h1 className="heading text-5xl leading-[0.95] md:text-7xl">
+            <span className="text-[#f59e0b]">SEASONAL</span>
+            <br />
+            <span className="text-white">SPORTS HUB</span>
+          </h1>
+          <p className="mt-6 max-w-2xl text-lg italic text-white/80">
+            “Success is no accident. It is hard work, perseverance, learning, sacrifice, and most
+            of all, love of what you are doing or learning to do.” — Pelé
           </p>
-          <div className="mt-8 flex flex-wrap justify-center gap-3">
+          <div className="mt-8 flex flex-wrap gap-3">
             <Link href="/results" className="btn-primary px-6 py-3 text-base">Submit Results</Link>
             <Link href="/allocations" className="btn-gold px-6 py-3 text-base">View Allocations</Link>
             <Link
