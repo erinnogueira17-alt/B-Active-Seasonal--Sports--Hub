@@ -1,0 +1,78 @@
+@import "tailwindcss";
+
+@theme {
+  --color-brand-black: #0a0a0a;
+  --color-brand-red: #dc2626;
+  --color-brand-gold: #f59e0b;
+  --font-sans: "Inter", system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+}
+
+:root {
+  color-scheme: light;
+}
+
+body {
+  @apply bg-neutral-50 text-neutral-900 antialiased;
+  font-family: var(--font-sans);
+}
+
+/* ── Reusable brand components ─────────────────────────────── */
+@layer components {
+  .heading {
+    @apply font-extrabold uppercase tracking-tight;
+  }
+
+  .btn,
+  .btn-primary,
+  .btn-gold,
+  .btn-outline,
+  .btn-dark,
+  .btn-ghost {
+    @apply inline-flex cursor-pointer items-center justify-center gap-2 rounded-md px-4 py-2
+      text-sm font-semibold transition-colors disabled:cursor-not-allowed disabled:opacity-50;
+  }
+  .btn-primary {
+    @apply bg-[#dc2626] text-white hover:bg-red-700;
+  }
+  .btn-gold {
+    @apply border border-[#f59e0b] text-[#b45309] hover:bg-[#f59e0b] hover:text-black;
+  }
+  .btn-outline {
+    @apply border border-neutral-300 bg-white text-neutral-800 hover:bg-neutral-100;
+  }
+  .btn-dark {
+    @apply bg-neutral-900 text-white hover:bg-neutral-700;
+  }
+  .btn-ghost {
+    @apply text-neutral-600 hover:bg-neutral-100;
+  }
+
+  .card {
+    @apply rounded-xl border border-neutral-200 bg-white shadow-sm;
+  }
+
+  .input {
+    @apply w-full rounded-md border border-neutral-300 bg-white px-3 py-2 text-sm
+      outline-none focus:border-[#dc2626] focus:ring-2 focus:ring-red-100;
+  }
+  .label {
+    @apply mb-1 block text-sm font-medium text-neutral-700;
+  }
+
+  .badge {
+    @apply inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold;
+  }
+}
+
+/* Print styles for browser-based report export */
+@media print {
+  .no-print {
+    display: none !important;
+  }
+  body {
+    background: white;
+  }
+  .print-page {
+    page-break-after: always;
+  }
+}
