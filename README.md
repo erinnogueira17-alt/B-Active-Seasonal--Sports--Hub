@@ -60,9 +60,16 @@ In **Settings → Environment Variables**, add:
 
 ### 5. Deploy, then create the tables and seed data
 1. Click **Deploy**. Wait for the build to finish.
-2. Create the database tables and seed the initial data. Two options:
+2. Create the database tables and seed the initial data. Pick **one** option:
 
-   **A. From your own machine** (simplest):
+   **A. Paste one SQL file — no terminal needed (easiest):**
+   1. Open **`db/setup.sql`** in this repo and copy the whole file.
+   2. In Vercel, open **Storage → your Postgres database → Query** (or the
+      **Neon Console → SQL Editor** it links to).
+   3. Paste and **Run**. This creates every table and loads all seed data
+      (Term 3 coaches, schools, allocations, leaderboard, settings) in one shot.
+
+   **B. From your own machine:**
    ```bash
    git clone <this-repo> && cd B-Active-Seasonal--Sports--Hub
    npm install
@@ -72,14 +79,14 @@ In **Settings → Environment Variables**, add:
    npm run db:seed     # seeds Term 3 coaches, schools, allocations, leaderboard
    ```
 
-   **B. Using Vercel CLI** (`npm i -g vercel`):
+   **C. Using Vercel CLI** (`npm i -g vercel`):
    ```bash
-   vercel link         # link to the project
-   vercel env pull .env
-   npm install
-   npm run db:push
-   npm run db:seed
+   vercel link && vercel env pull .env
+   npm install && npm run db:push && npm run db:seed
    ```
+
+   > Regenerate `db/setup.sql` after any schema/seed change with
+   > `npm run db:generate && npm run db:setup-sql`.
 
 ### 6. Create the first admin
 1. Open the deployed site → **Sign in → Create account**.

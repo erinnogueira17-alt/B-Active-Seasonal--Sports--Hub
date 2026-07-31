@@ -16,6 +16,7 @@
     "db:generate": "drizzle-kit generate",
     "db:push": "drizzle-kit push",
     "db:seed": "tsx src/server/scripts/seed.ts",
+    "db:setup-sql": "tsx src/server/scripts/gen-setup-sql.ts",
     "test": "vitest run"
   },
   "dependencies": {
