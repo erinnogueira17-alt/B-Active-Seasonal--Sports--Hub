@@ -257,7 +257,7 @@ INSERT INTO coaches (name, term) VALUES
   ('Jerome', 'term1'),
   ('Tapiwa', 'term1');
 
--- Leaderboard init (term1, 0 points)
+-- Leaderboard (term1)
 INSERT INTO live_log (entity_name, points, term) VALUES
   ('Kabelo', 0, 'term1'),
   ('Thembi', 0, 'term1'),
@@ -357,7 +357,7 @@ INSERT INTO coaches (name, term) VALUES
   ('Sergio', 'term2'),
   ('Shalom', 'term2');
 
--- Leaderboard init (term2, 0 points)
+-- Leaderboard (term2)
 INSERT INTO live_log (entity_name, points, term) VALUES
   ('Harnu', 0, 'term2'),
   ('Thembi', 0, 'term2'),
@@ -468,27 +468,27 @@ INSERT INTO coaches (name, term) VALUES
   ('Dylan', 'term3'),
   ('Sergio', 'term3');
 
--- Leaderboard init (term3, 0 points)
+-- Leaderboard (term3)
 INSERT INTO live_log (entity_name, points, term) VALUES
   ('Musa', 0, 'term3'),
-  ('Lungile', 0, 'term3'),
-  ('Ross', 0, 'term3'),
+  ('Lungile', 2, 'term3'),
+  ('Ross', 2, 'term3'),
   ('Edgar', 0, 'term3'),
   ('Paballo', 0, 'term3'),
-  ('Thembi', 0, 'term3'),
+  ('Thembi', 2, 'term3'),
   ('Lasley', 0, 'term3'),
-  ('Na''eel', 0, 'term3'),
-  ('Keatlegile', 0, 'term3'),
+  ('Na''eel', 2, 'term3'),
+  ('Keatlegile', 2, 'term3'),
   ('Samokelo', 0, 'term3'),
   ('Justin', 0, 'term3'),
   ('Breyton', 0, 'term3'),
   ('Abbey', 0, 'term3'),
   ('Tapiwa', 0, 'term3'),
-  ('Lebogang', 0, 'term3'),
-  ('Sipho', 0, 'term3'),
+  ('Lebogang', 2, 'term3'),
+  ('Sipho', 2, 'term3'),
   ('Kabelo', 0, 'term3'),
-  ('Mpho', 0, 'term3'),
-  ('Daniel', 0, 'term3'),
+  ('Mpho', 2, 'term3'),
+  ('Daniel', 2, 'term3'),
   ('Tshepiso', 0, 'term3'),
   ('Harnu', 0, 'term3'),
   ('Remi', 0, 'term3'),
@@ -510,8 +510,8 @@ INSERT INTO live_log (entity_name, points, term) VALUES
   ('Mikael', 0, 'term3'),
   ('Jerome', 0, 'term3'),
   ('Nhlanhla', 0, 'term3'),
-  ('Akimi', 0, 'term3'),
-  ('Shalom', 0, 'term3'),
+  ('Akimi', 2, 'term3'),
+  ('Shalom', 2, 'term3'),
   ('Dylan', 0, 'term3'),
   ('Sergio', 0, 'term3');
 

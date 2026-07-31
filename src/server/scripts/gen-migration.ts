@@ -16,6 +16,25 @@ const root = join(here, "..", "..", "..");
 const q = (s: string) => `'${s.replace(/'/g, "''")}'`;
 const TERMS = ["term1", "term2", "term3", "term4"] as const;
 
+// Real leaderboard points exported from the previous hub. Only names listed
+// here get non-zero points; everyone else starts at 0.
+const POINTS: Record<string, Record<string, number>> = {
+  term3: {
+    Mpho: 2,
+    Lungile: 2,
+    Daniel: 2,
+    Sipho: 2,
+    Lebogang: 2,
+    Keatlegile: 2,
+    "Na'eel": 2,
+    Akimi: 2,
+    Shalom: 2,
+    Thembi: 2,
+    Ross: 2,
+  },
+};
+const pointsFor = (term: string, coach: string) => POINTS[term]?.[coach] ?? 0;
+
 // Unique schools (sorted).
 const schools = [...new Set(OLD_ALLOCATIONS.map(([school]) => school))].sort((a, b) =>
   a.localeCompare(b),
@@ -67,10 +86,10 @@ for (const term of TERMS) {
       .join(",\n  ")};`,
   );
   lines.push("");
-  lines.push(`-- Leaderboard init (${term}, 0 points)`);
+  lines.push(`-- Leaderboard (${term})`);
   lines.push(
     `INSERT INTO live_log (entity_name, points, term) VALUES\n  ${coaches
-      .map((c) => `(${q(c)}, 0, '${term}')`)
+      .map((c) => `(${q(c)}, ${pointsFor(term, c)}, '${term}')`)
       .join(",\n  ")};`,
   );
   lines.push("");
