@@ -4,9 +4,15 @@ import { trpc } from "../lib/trpc";
 import { useAuth } from "../lib/useAuth";
 import { useToast } from "../components/Toast";
 import { uploadToBlob } from "../lib/blobUpload";
+import { labelFromFilename } from "../lib/utils";
 import { EmptyState, Loading, PageContainer, PageHeader } from "../components/ui";
 
 type Photo = { id: number; title: string | null; caption: string | null; imageUrl: string; createdAt: string | Date };
+
+/** Visible label for a photo: an admin caption if set, else derived from the filename. */
+function photoLabel(p: Photo): string {
+  return p.caption?.trim() || labelFromFilename(p.title);
+}
 
 function monthKey(d: string | Date) {
   return new Date(d).toLocaleDateString(undefined, { month: "long", year: "numeric" });
@@ -65,8 +71,8 @@ export function Gallery() {
         <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-black/90 p-4" onClick={() => setLightbox(null)}>
           <img src={lightbox.imageUrl} alt={lightbox.caption ?? ""} className="max-h-[80vh] max-w-full rounded" onClick={(e) => e.stopPropagation()} />
           <div className="mt-3 text-center text-white">
-            {lightbox.caption && <p className="mb-2">{lightbox.caption}</p>}
-            <button className="btn-gold" onClick={(e) => { e.stopPropagation(); downloadImage(lightbox.imageUrl, lightbox.caption || lightbox.title || "photo"); }}>
+            {photoLabel(lightbox) && <p className="mb-2 font-medium">{photoLabel(lightbox)}</p>}
+            <button className="btn-gold" onClick={(e) => { e.stopPropagation(); downloadImage(lightbox.imageUrl, photoLabel(lightbox) || "photo"); }}>
               <Download className="h-4 w-4" /> Download
             </button>
           </div>
@@ -88,21 +94,29 @@ function PhotoTile({ p, isAdmin, onOpen }: { p: Photo; isAdmin: boolean; onOpen:
     onError: (e) => toast(e.message, "error"),
   });
 
+  const label = photoLabel(p);
   return (
-    <div className="group relative overflow-hidden rounded-lg bg-neutral-200">
-      <img src={p.imageUrl} alt={p.caption ?? ""} className="h-40 w-full cursor-pointer object-cover" onClick={onOpen} loading="lazy" />
-      <div className="absolute inset-x-0 bottom-0 flex items-center justify-end gap-1 bg-gradient-to-t from-black/60 to-transparent p-1.5 opacity-0 transition-opacity group-hover:opacity-100">
-        <button className="rounded bg-white/90 p-1" onClick={() => downloadImage(p.imageUrl, p.caption || p.title || "photo")}><Download className="h-4 w-4" /></button>
-        {isAdmin && <button className="rounded bg-white/90 p-1" onClick={() => setEditing(true)}><Pencil className="h-4 w-4" /></button>}
-        {isAdmin && <button className="rounded bg-white/90 p-1 text-[#dc2626]" onClick={() => { if (confirm("Delete photo?")) del.mutate({ id: p.id }); }}><Trash2 className="h-4 w-4" /></button>}
-      </div>
-      {editing && (
-        <div className="absolute inset-0 flex flex-col justify-end bg-black/60 p-2">
-          <input className="input text-xs" value={caption} onChange={(e) => setCaption(e.target.value)} autoFocus placeholder="Caption" />
-          <div className="mt-1 flex justify-end gap-1">
-            <button className="rounded bg-green-600 p-1 text-white" onClick={() => updateCaption.mutate({ id: p.id, caption })}><Check className="h-4 w-4" /></button>
-            <button className="rounded bg-neutral-600 p-1 text-white" onClick={() => setEditing(false)}><X className="h-4 w-4" /></button>
+    <div className="card group overflow-hidden">
+      <div className="relative overflow-hidden bg-neutral-200">
+        <img src={p.imageUrl} alt={label} className="h-40 w-full cursor-pointer object-cover" onClick={onOpen} loading="lazy" />
+        <div className="absolute inset-x-0 bottom-0 flex items-center justify-end gap-1 bg-gradient-to-t from-black/60 to-transparent p-1.5 opacity-0 transition-opacity group-hover:opacity-100">
+          <button className="rounded bg-white/90 p-1" onClick={() => downloadImage(p.imageUrl, label || "photo")}><Download className="h-4 w-4" /></button>
+          {isAdmin && <button className="rounded bg-white/90 p-1" onClick={() => setEditing(true)}><Pencil className="h-4 w-4" /></button>}
+          {isAdmin && <button className="rounded bg-white/90 p-1 text-[#dc2626]" onClick={() => { if (confirm("Delete photo?")) del.mutate({ id: p.id }); }}><Trash2 className="h-4 w-4" /></button>}
+        </div>
+        {editing && (
+          <div className="absolute inset-0 flex flex-col justify-end bg-black/60 p-2">
+            <input className="input text-xs" value={caption} onChange={(e) => setCaption(e.target.value)} autoFocus placeholder="Caption" />
+            <div className="mt-1 flex justify-end gap-1">
+              <button className="rounded bg-green-600 p-1 text-white" onClick={() => updateCaption.mutate({ id: p.id, caption })}><Check className="h-4 w-4" /></button>
+              <button className="rounded bg-neutral-600 p-1 text-white" onClick={() => setEditing(false)}><X className="h-4 w-4" /></button>
+            </div>
           </div>
+        )}
+      </div>
+      {label && (
+        <div className="px-2 py-1.5 text-center text-xs font-medium text-neutral-700" title={label}>
+          {label}
         </div>
       )}
     </div>

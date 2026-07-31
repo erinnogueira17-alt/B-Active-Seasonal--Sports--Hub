@@ -54,6 +54,21 @@ export const TERMS = [
 
 export type Term = (typeof TERMS)[number]["value"];
 
+/**
+ * Turns an uploaded filename into a readable label, e.g.
+ * "Coach_Daniel_-_Colin_Mann_Football.jpg" → "Coach Daniel – Colin Mann Football".
+ */
+export function labelFromFilename(name?: string | null): string {
+  if (!name) return "";
+  return name
+    .replace(/\.[^.]+$/, "") // drop extension
+    .replace(/\s*\(\d+\)\s*$/, "") // drop " (1)" dedupe suffix
+    .replace(/_+/g, " ") // underscores → spaces
+    .replace(/\s*-\s*/g, " – ") // tidy dash separators
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
 export function fileToBase64(file: File): Promise<string> {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
