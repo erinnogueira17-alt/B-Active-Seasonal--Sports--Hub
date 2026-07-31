@@ -72,9 +72,8 @@ They'll have admin access next time they load the site.
 
 ## 5. How changes go live
 
-The GitHub repo is connected to Vercel. **Every push to the
-`claude/sports-hub-vercel-setup-wzc3dq` branch auto-deploys** — no manual step.
-Watch progress at:
+The GitHub repo is connected to Vercel. **Every push to the `main` branch
+auto-deploys** to the live site — no manual step. Watch progress at:
 https://vercel.com/b-active/b-active-seasonal-sports-hub/deployments
 
 ---
