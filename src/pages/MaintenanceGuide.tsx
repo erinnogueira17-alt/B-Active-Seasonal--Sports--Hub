@@ -36,7 +36,7 @@ function Inner() {
         <LinkCard href={DEPLOYMENTS} label="Vercel deployments" value="Watch builds go live" />
       </div>
 
-      <Section n={1} icon={CalendarClock} title="Start of a new term (the two code edits)">
+      <Section n={1} icon={CalendarClock} title="Start of a new term (the code edits)">
         <p>
           The planner submission window and the "current term" are set in one file:{" "}
           <Code>src/pages/SubmitPlanner.tsx</Code> (top of the file).
@@ -55,6 +55,11 @@ function getCurrentTerm() { return "term3"; }  // the active term`}</CodeBlock>
           </li>
           <li>
             Make sure <Code>SEASON_OPEN = true</Code>.
+          </li>
+          <li>
+            Update the <strong>home-page dashboard</strong> leaderboard term: set{" "}
+            <Code>CURRENT_TERM</Code> in <Code>src/components/QuickDashboard.tsx</Code> to the new term
+            (e.g. <Code>"term4"</Code>).
           </li>
           <li>Save → commit → push. The site redeploys automatically (see §5).</li>
         </ol>

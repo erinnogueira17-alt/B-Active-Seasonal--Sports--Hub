@@ -8,7 +8,7 @@ Admin panel: sign in, then the gold **Admin Panel** button appears in the nav.
 
 ---
 
-## 1. Start of a new term (the two code edits)
+## 1. Start of a new term (the code edits)
 
 The planner submission window and the "current term" are set in one file:
 `src/pages/SubmitPlanner.tsx` (top of the file).
@@ -24,7 +24,9 @@ At the start of a new term:
 1. Set `getCurrentTerm()` to the new term (e.g. `"term4"`).
 2. Set `TERM_START` to the term's start date.
 3. Make sure `SEASON_OPEN = true`.
-4. Save → commit → push. The site redeploys automatically (see §5).
+4. Update the **home-page dashboard** leaderboard term: set `CURRENT_TERM`
+   in `src/components/QuickDashboard.tsx` to the new term (e.g. `"term4"`).
+5. Save → commit → push. The site redeploys automatically (see §5).
 
 At the **end** of a season, set `SEASON_OPEN = false` and push — planner
 submissions close with a "season ended" message.
