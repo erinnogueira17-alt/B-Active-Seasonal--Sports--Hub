@@ -17,10 +17,31 @@ const root = join(here, "..", "..", "..");
 const q = (s: string) => `'${s.replace(/'/g, "''")}'`;
 const TERMS = ["term1", "term2", "term3", "term4"] as const;
 
-// Unique schools (sorted).
-const schools = [...new Set(OLD_ALLOCATIONS.map(([school]) => school))].sort((a, b) =>
-  a.localeCompare(b),
-);
+// Authoritative school list (the results-form dropdown source in the old hub).
+const schools = [
+  "Bellavista",
+  "Carlswald House",
+  "Colin Mann",
+  "Crawford Sandton",
+  "Curro Aurora",
+  "Curro Douglasdale",
+  "Curro Halfway Gardens",
+  "Curro Rivonia",
+  "Curro Sagewood",
+  "Curro Savanna City",
+  "Curro Thatchfield",
+  "Kings Linbro Park",
+  "Lion Pride Academy",
+  "Lonehill International",
+  "Northriding Junior College",
+  "Parkview Junior",
+  "Parkview Senior",
+  "Rallim",
+  "Reddam Waterfall",
+  "Reddford House Northcliff",
+  "Sandton Sinai",
+  "St Francis",
+];
 
 // Unique coach names per term (roster), in first-seen order.
 const coachesByTerm = new Map<string, string[]>();
