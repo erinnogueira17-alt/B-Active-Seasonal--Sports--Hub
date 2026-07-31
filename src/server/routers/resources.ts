@@ -71,6 +71,38 @@ export const resourcesRouter = router({
       return { success: true, url, resource: inserted[0] };
     }),
 
+  // Called by the browser after a direct-to-Blob upload completes.
+  saveUploaded: adminProcedure
+    .input(
+      z.object({
+        url: z.string().url(),
+        pathname: z.string(),
+        title: z.string().min(1).max(255),
+        description: z.string().optional(),
+        category: categorySchema,
+        subcategory: subcategorySchema.optional(),
+        fileType: z.string().max(100).optional(),
+        fileSize: z.number().optional(),
+      }),
+    )
+    .mutation(async ({ input, ctx }) => {
+      const inserted = await db
+        .insert(resources)
+        .values({
+          title: input.title,
+          description: input.description,
+          category: input.category,
+          subcategory: input.subcategory,
+          fileUrl: input.url,
+          fileKey: input.pathname,
+          fileType: input.fileType,
+          fileSize: input.fileSize,
+          uploadedBy: ctx.user.id,
+        })
+        .returning();
+      return { success: true, resource: inserted[0] };
+    }),
+
   update: adminProcedure
     .input(
       z.object({

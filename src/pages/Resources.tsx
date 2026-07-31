@@ -3,7 +3,8 @@ import { Trash2, ExternalLink, Upload } from "lucide-react";
 import { trpc } from "../lib/trpc";
 import { useAuth } from "../lib/useAuth";
 import { useToast } from "../components/Toast";
-import { fileToBase64, formatBytes, formatDate } from "../lib/utils";
+import { formatBytes, formatDate } from "../lib/utils";
+import { uploadToBlob } from "../lib/blobUpload";
 import { EmptyState, Loading, PageContainer, PageHeader } from "../components/ui";
 
 const CATEGORIES = ["football", "rugby", "hockey", "netball", "swimming", "athletics", "softball", "basketball", "tennis"] as const;
@@ -97,7 +98,8 @@ function UploadPanel() {
   const [description, setDescription] = useState("");
   const [file, setFile] = useState<File | null>(null);
 
-  const upload = trpc.resources.upload.useMutation({
+  const [busy, setBusy] = useState(false);
+  const save = trpc.resources.saveUploaded.useMutation({
     onSuccess: () => {
       utils.resources.list.invalidate();
       toast("Resource uploaded");
@@ -109,11 +111,18 @@ function UploadPanel() {
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!file) return;
-    const fileData = await fileToBase64(file);
-    upload.mutate({
-      title, description: description || undefined, category, subcategory,
-      fileData, fileName: file.name, fileType: file.type || "application/octet-stream", fileSize: file.size,
-    });
+    setBusy(true);
+    try {
+      const { url, pathname } = await uploadToBlob("resources", file);
+      await save.mutateAsync({
+        url, pathname, title, description: description || undefined, category, subcategory,
+        fileType: file.type || "application/octet-stream", fileSize: file.size,
+      });
+    } catch (err: any) {
+      toast(err?.message ?? "Upload failed", "error");
+    } finally {
+      setBusy(false);
+    }
   };
 
   return (
@@ -149,8 +158,8 @@ function UploadPanel() {
           }} required />
         </div>
       </div>
-      <button type="submit" className="btn-primary mt-4" disabled={!file || upload.isPending}>
-        <Upload className="h-4 w-4" /> {upload.isPending ? "Uploading…" : "Upload"}
+      <button type="submit" className="btn-primary mt-4" disabled={!file || busy}>
+        <Upload className="h-4 w-4" /> {busy ? "Uploading…" : "Upload"}
       </button>
     </form>
   );

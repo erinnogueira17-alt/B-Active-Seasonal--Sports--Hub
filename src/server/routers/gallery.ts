@@ -43,6 +43,30 @@ export const galleryRouter = router({
       return { success: true, photo: inserted[0] };
     }),
 
+  // Called by the browser after a direct-to-Blob upload completes.
+  saveUploaded: publicProcedure
+    .input(
+      z.object({
+        url: z.string().url(),
+        pathname: z.string(),
+        title: z.string().max(255).optional(),
+        caption: z.string().optional(),
+      }),
+    )
+    .mutation(async ({ input, ctx }) => {
+      const inserted = await db
+        .insert(gallery)
+        .values({
+          title: input.title,
+          caption: input.caption,
+          imageUrl: input.url,
+          imageKey: input.pathname,
+          uploadedBy: ctx.user?.id,
+        })
+        .returning();
+      return { success: true, photo: inserted[0] };
+    }),
+
   list: publicProcedure.query(async () => {
     return db.select().from(gallery).orderBy(desc(gallery.createdAt));
   }),

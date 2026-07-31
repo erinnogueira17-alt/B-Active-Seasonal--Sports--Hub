@@ -3,7 +3,7 @@ import { Trash2, Download, Pencil, X, Upload, Check } from "lucide-react";
 import { trpc } from "../lib/trpc";
 import { useAuth } from "../lib/useAuth";
 import { useToast } from "../components/Toast";
-import { fileToBase64 } from "../lib/utils";
+import { uploadToBlob } from "../lib/blobUpload";
 import { EmptyState, Loading, PageContainer, PageHeader } from "../components/ui";
 
 type Photo = { id: number; title: string | null; caption: string | null; imageUrl: string; createdAt: string | Date };
@@ -112,30 +112,39 @@ function PhotoTile({ p, isAdmin, onOpen }: { p: Photo; isAdmin: boolean; onOpen:
 function UploadArea() {
   const utils = trpc.useUtils();
   const { toast } = useToast();
-  const [busy, setBusy] = useState(false);
-  const upload = trpc.gallery.upload.useMutation();
+  const [progress, setProgress] = useState<{ done: number; total: number } | null>(null);
+  const save = trpc.gallery.saveUploaded.useMutation();
 
   const handleFiles = async (files: FileList | null) => {
     if (!files || files.length === 0) return;
-    setBusy(true);
-    for (const file of Array.from(files)) {
+    const list = Array.from(files);
+    let ok = 0;
+    let failed = 0;
+    setProgress({ done: 0, total: list.length });
+    for (const [i, file] of list.entries()) {
       try {
-        const imageData = await fileToBase64(file);
-        await upload.mutateAsync({ imageData, fileName: file.name, title: file.name });
+        const { url, pathname } = await uploadToBlob("gallery", file);
+        await save.mutateAsync({ url, pathname, title: file.name });
+        ok++;
       } catch (e: any) {
-        toast(`Failed: ${file.name}`, "error");
+        failed++;
+        toast(`Failed: ${file.name} — ${e?.message ?? "upload error"}`, "error");
       }
+      setProgress({ done: i + 1, total: list.length });
     }
-    setBusy(false);
+    setProgress(null);
     utils.gallery.list.invalidate();
-    toast("Upload complete");
+    if (ok) toast(`${ok} photo${ok > 1 ? "s" : ""} uploaded${failed ? `, ${failed} failed` : ""}`);
   };
 
+  const busy = progress !== null;
   return (
     <label className="card mb-8 flex cursor-pointer flex-col items-center justify-center border-2 border-dashed p-8 text-center text-neutral-500 hover:border-[#dc2626]">
       <Upload className="mb-2 h-8 w-8 text-[#dc2626]" />
-      <span className="font-medium">{busy ? "Uploading…" : "Click to upload photos"}</span>
-      <span className="text-xs">Multiple images supported · max 10 MB each</span>
+      <span className="font-medium">
+        {busy ? `Uploading ${progress!.done}/${progress!.total}…` : "Click or drag to upload photos"}
+      </span>
+      <span className="text-xs">Multiple images supported · max 25 MB each</span>
       <input type="file" accept="image/*" multiple className="hidden" disabled={busy}
         onChange={(e) => handleFiles(e.target.files)} />
     </label>
