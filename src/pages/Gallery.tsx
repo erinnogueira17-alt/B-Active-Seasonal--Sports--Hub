@@ -7,7 +7,14 @@ import { uploadToBlob } from "../lib/blobUpload";
 import { labelFromFilename } from "../lib/utils";
 import { EmptyState, Loading, PageContainer, PageHeader } from "../components/ui";
 
-type Photo = { id: number; title: string | null; caption: string | null; imageUrl: string; createdAt: string | Date };
+type Photo = {
+  id: number;
+  title: string | null;
+  caption: string | null;
+  imageUrl: string;
+  uploaderName?: string | null;
+  createdAt: string | Date;
+};
 
 /** Visible label for a photo: an admin caption if set, else derived from the filename. */
 function photoLabel(p: Photo): string {
@@ -81,7 +88,8 @@ export function Gallery() {
         <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-black/90 p-4" onClick={() => setLightbox(null)}>
           <img src={lightbox.imageUrl} alt={lightbox.caption ?? ""} className="max-h-[80vh] max-w-full rounded" onClick={(e) => e.stopPropagation()} />
           <div className="mt-3 text-center text-white">
-            {photoLabel(lightbox) && <p className="mb-2 font-medium">{photoLabel(lightbox)}</p>}
+            {photoLabel(lightbox) && <p className="font-medium">{photoLabel(lightbox)}</p>}
+            {lightbox.uploaderName && <p className="mb-2 text-sm text-white/60">Added by {lightbox.uploaderName}</p>}
             <button className="btn-gold" onClick={(e) => { e.stopPropagation(); downloadImage(lightbox.imageUrl, photoLabel(lightbox) || "photo"); }}>
               <Download className="h-4 w-4" /> Download
             </button>
@@ -124,9 +132,16 @@ function PhotoTile({ p, isAdmin, onOpen }: { p: Photo; isAdmin: boolean; onOpen:
           </div>
         )}
       </div>
-      {label && (
-        <div className="px-2 py-1.5 text-center text-xs font-medium text-neutral-700" title={label}>
-          {label}
+      {(label || p.uploaderName) && (
+        <div className="px-2 py-1.5 text-center">
+          {label && (
+            <div className="truncate text-xs font-medium text-neutral-700" title={label}>
+              {label}
+            </div>
+          )}
+          {p.uploaderName && (
+            <div className="mt-0.5 text-[11px] text-neutral-400">by {p.uploaderName}</div>
+          )}
         </div>
       )}
     </div>

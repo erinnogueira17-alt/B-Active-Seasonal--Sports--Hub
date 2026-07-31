@@ -39,10 +39,13 @@ const t = initTRPC.context<Context>().create({
 export const router = t.router;
 export const publicProcedure = t.procedure;
 
-/** Requires any authenticated user. */
+/** Requires any authenticated, admin-approved user. */
 export const protectedProcedure = t.procedure.use(({ ctx, next }) => {
   if (!ctx.user) {
     throw new TRPCError({ code: "UNAUTHORIZED", message: "Login required." });
+  }
+  if (!ctx.user.approved && ctx.user.role !== "admin") {
+    throw new TRPCError({ code: "FORBIDDEN", message: "Your account is awaiting admin approval." });
   }
   return next({ ctx: { ...ctx, user: ctx.user } });
 });

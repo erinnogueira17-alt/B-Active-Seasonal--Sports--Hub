@@ -3,7 +3,7 @@ import { desc, eq } from "drizzle-orm";
 import { TRPCError } from "@trpc/server";
 import { router, publicProcedure, protectedProcedure, adminProcedure } from "../trpc.js";
 import { db } from "../db/index.js";
-import { gallery } from "../db/schema.js";
+import { gallery, users } from "../db/schema.js";
 import { uploadBase64 } from "../blob.js";
 
 const MAX_IMAGE_BYTES = 10 * 1024 * 1024; // 10 MB
@@ -69,7 +69,20 @@ export const galleryRouter = router({
     }),
 
   list: publicProcedure.query(async () => {
-    return db.select().from(gallery).orderBy(desc(gallery.createdAt));
+    return db
+      .select({
+        id: gallery.id,
+        title: gallery.title,
+        caption: gallery.caption,
+        imageUrl: gallery.imageUrl,
+        imageKey: gallery.imageKey,
+        uploadedBy: gallery.uploadedBy,
+        uploaderName: users.name,
+        createdAt: gallery.createdAt,
+      })
+      .from(gallery)
+      .leftJoin(users, eq(gallery.uploadedBy, users.id))
+      .orderBy(desc(gallery.createdAt));
   }),
 
   delete: adminProcedure

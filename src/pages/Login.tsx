@@ -11,6 +11,7 @@ export function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [, navigate] = useLocation();
+  const [notice, setNotice] = useState<string | null>(null);
   const { refetch } = useAuth();
   const utils = trpc.useUtils();
   const { toast } = useToast();
@@ -18,7 +19,7 @@ export function Login() {
   const onDone = async () => {
     await utils.invalidate();
     await refetch();
-    navigate("/admin");
+    navigate("/");
   };
 
   const login = trpc.auth.login.useMutation({
@@ -29,7 +30,16 @@ export function Login() {
     onError: (e) => toast(e.message, "error"),
   });
   const register = trpc.auth.register.useMutation({
-    onSuccess: async () => {
+    onSuccess: async (data) => {
+      if (data.pending) {
+        // Pending accounts are not logged in — wait for admin approval.
+        setNotice(
+          "Account created! An admin needs to approve it before you can sign in. You'll be able to log in once approved.",
+        );
+        setMode("login");
+        setPassword("");
+        return;
+      }
       toast("Account created!");
       await onDone();
     },
@@ -61,6 +71,12 @@ export function Login() {
             Create account
           </button>
         </div>
+
+        {notice && (
+          <div className="mb-4 rounded-lg border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-800">
+            {notice}
+          </div>
+        )}
 
         <form onSubmit={submit} className="space-y-4">
           {mode === "register" && (
@@ -99,7 +115,7 @@ export function Login() {
         </form>
 
         <p className="mt-4 text-center text-xs text-neutral-500">
-          The first account created becomes the administrator.
+          New accounts must be approved by an admin before you can sign in.
         </p>
       </div>
     </PageContainer>

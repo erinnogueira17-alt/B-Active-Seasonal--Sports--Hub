@@ -49,16 +49,24 @@ submissions close with a "season ended" message.
 
 ---
 
-## 3. Add another admin
+## 3. Coach accounts & approvals
 
-New people sign up on the site first (Sign in → Create account). To make one an
-admin, run this in the database (see §6 for where):
+Coaches need an account to upload photos to the gallery. They sign up on the
+site (Sign in → **Create account**), then **you approve them**:
 
-```sql
-UPDATE users SET role = 'admin' WHERE email = 'their.email@example.com';
-```
+- Go to Admin → **Coach Accounts** (the dashboard also shows a gold banner when
+  someone is waiting).
+- **Approve** to let them in, or **Reject** to delete the request.
+- Until approved, a new account **cannot sign in** and **cannot see the admin
+  panel** — approval only grants normal coach access (uploading photos,
+  attaching planner files).
 
-They'll have admin access next time they load the site.
+**Make someone an admin:** on the same page, use **Make admin** (or **Make
+coach** to remove it). You can't change your own role, so there's always at
+least one admin. Suspend re-locks an account without deleting it.
+
+> Planner file uploads are open to all coaches and need no account — only the
+> gallery requires a signed-in, approved account.
 
 ---
 
@@ -91,6 +99,8 @@ Reusable SQL files live in the `db/` folder of the repo:
 - `migrate-old-data.sql` — schools, allocations, coach rosters, leaderboard
 - `migrate-results.sql` — results history
 - `resources-seed.sql` — curated official coaching/refereeing links
+- `dedupe-resources.sql` — remove duplicate curated links (if seeded twice)
+- `add-account-approval.sql` — one-time: adds the account-approval flag
 
 ---
 

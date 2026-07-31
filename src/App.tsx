@@ -16,6 +16,7 @@ import { ManageEvents } from "./pages/ManageEvents";
 import { ManageResources } from "./pages/ManageResources";
 import { ManageCoaches } from "./pages/ManageCoaches";
 import { PlannerAnalytics } from "./pages/PlannerAnalytics";
+import { ManageAccounts } from "./pages/ManageAccounts";
 import { MaintenanceGuide } from "./pages/MaintenanceGuide";
 import { NotFound } from "./pages/NotFound";
 
@@ -40,6 +41,7 @@ export default function App() {
           <Route path="/manage-resources" component={ManageResources} />
           <Route path="/manage-coaches" component={ManageCoaches} />
           <Route path="/planner-analytics" component={PlannerAnalytics} />
+          <Route path="/manage-accounts" component={ManageAccounts} />
           <Route path="/maintenance-guide" component={MaintenanceGuide} />
           <Route component={NotFound} />
         </Switch>

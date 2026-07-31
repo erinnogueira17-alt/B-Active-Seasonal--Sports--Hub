@@ -20,6 +20,7 @@ const ADMIN_LINKS = [
   ["/manage-events", "Calendar"],
   ["/manage-resources", "Resources+"],
   ["/manage-coaches", "Coaches"],
+  ["/manage-accounts", "Accounts"],
   ["/planner-analytics", "Analytics"],
   ["/maintenance-guide", "Guide"],
 ];

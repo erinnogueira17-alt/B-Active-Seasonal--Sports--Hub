@@ -1,7 +1,7 @@
 import { z } from "zod";
-import { eq, sql } from "drizzle-orm";
+import { eq, sql, desc, asc } from "drizzle-orm";
 import { TRPCError } from "@trpc/server";
-import { router, publicProcedure } from "../trpc.js";
+import { router, publicProcedure, adminProcedure } from "../trpc.js";
 import { db } from "../db/index.js";
 import { users, type User } from "../db/schema.js";
 import {
@@ -44,7 +44,9 @@ export const authRouter = router({
         });
       }
 
-      // The very first account, or one matching ADMIN_EMAIL, becomes admin.
+      // The very first account, or one matching ADMIN_EMAIL, becomes an
+      // approved admin. Everyone else starts as a pending coach account that
+      // an admin must approve before it can sign in.
       const [{ count }] = await db
         .select({ count: sql<number>`count(*)::int` })
         .from(users);
@@ -61,14 +63,19 @@ export const authRouter = router({
           email,
           passwordHash,
           role: bootstrapAdmin ? "admin" : "user",
+          approved: bootstrapAdmin,
           loginMethod: "password",
-          lastSignedIn: new Date(),
+          lastSignedIn: bootstrapAdmin ? new Date() : null,
         })
         .returning();
 
       const user = inserted[0];
-      ctx.res.setHeader("Set-Cookie", buildSessionCookie(signSession(user.id)));
-      return publicUser(user);
+      // Only log the user in immediately if they're already approved (the
+      // bootstrap admin). Pending coaches must wait for approval.
+      if (user.approved) {
+        ctx.res.setHeader("Set-Cookie", buildSessionCookie(signSession(user.id)));
+      }
+      return { ...publicUser(user), pending: !user.approved };
     }),
 
   login: publicProcedure
@@ -92,6 +99,12 @@ export const authRouter = router({
           message: "Invalid email or password.",
         });
       }
+      if (!user.approved && user.role !== "admin") {
+        throw new TRPCError({
+          code: "FORBIDDEN",
+          message: "Your account is awaiting admin approval.",
+        });
+      }
       await db
         .update(users)
         .set({ lastSignedIn: new Date() })
@@ -104,4 +117,55 @@ export const authRouter = router({
     ctx.res.setHeader("Set-Cookie", buildClearCookie());
     return { success: true };
   }),
+
+  // ── Admin: manage coach accounts ──────────────────────────────
+  listUsers: adminProcedure.query(async () => {
+    const rows = await db
+      .select()
+      .from(users)
+      // Pending accounts first, then newest.
+      .orderBy(asc(users.approved), desc(users.createdAt));
+    return rows.map(publicUser);
+  }),
+
+  setApproved: adminProcedure
+    .input(z.object({ id: z.number(), approved: z.boolean() }))
+    .mutation(async ({ input, ctx }) => {
+      if (input.id === ctx.user.id && !input.approved) {
+        throw new TRPCError({ code: "BAD_REQUEST", message: "You can't revoke your own access." });
+      }
+      await db
+        .update(users)
+        .set({ approved: input.approved, updatedAt: new Date() })
+        .where(eq(users.id, input.id));
+      return { success: true };
+    }),
+
+  setRole: adminProcedure
+    .input(z.object({ id: z.number(), role: z.enum(["user", "admin"]) }))
+    .mutation(async ({ input, ctx }) => {
+      if (input.id === ctx.user.id && input.role !== "admin") {
+        throw new TRPCError({ code: "BAD_REQUEST", message: "You can't remove your own admin role." });
+      }
+      // Promoting to admin implies approval.
+      await db
+        .update(users)
+        .set({
+          role: input.role,
+          ...(input.role === "admin" ? { approved: true } : {}),
+          updatedAt: new Date(),
+        })
+        .where(eq(users.id, input.id));
+      return { success: true };
+    }),
+
+  deleteUser: adminProcedure
+    .input(z.object({ id: z.number() }))
+    .mutation(async ({ input, ctx }) => {
+      if (input.id === ctx.user.id) {
+        throw new TRPCError({ code: "BAD_REQUEST", message: "You can't delete your own account." });
+      }
+      await db.delete(users).where(eq(users.id, input.id));
+      return { success: true };
+    }),
 });
