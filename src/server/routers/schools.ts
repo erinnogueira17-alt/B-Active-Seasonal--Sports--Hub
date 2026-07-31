@@ -1,8 +1,8 @@
 import { z } from "zod";
 import { asc, eq } from "drizzle-orm";
-import { router, publicProcedure, adminProcedure } from "../trpc";
-import { db } from "../db/index";
-import { schools } from "../db/schema";
+import { router, publicProcedure, adminProcedure } from "../trpc.js";
+import { db } from "../db/index.js";
+import { schools } from "../db/schema.js";
 
 export const schoolsRouter = router({
   list: publicProcedure.query(async () => {

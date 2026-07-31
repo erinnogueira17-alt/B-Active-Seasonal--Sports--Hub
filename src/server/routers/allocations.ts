@@ -1,8 +1,8 @@
 import { z } from "zod";
 import { eq } from "drizzle-orm";
-import { router, publicProcedure } from "../trpc";
-import { db } from "../db/index";
-import { allocations } from "../db/schema";
+import { router, publicProcedure } from "../trpc.js";
+import { db } from "../db/index.js";
+import { allocations } from "../db/schema.js";
 
 const termSchema = z.enum(["term1", "term2", "term3", "term4"]);
 

@@ -1,10 +1,10 @@
 import { z } from "zod";
 import { desc, eq } from "drizzle-orm";
 import { TRPCError } from "@trpc/server";
-import { router, publicProcedure, adminProcedure } from "../trpc";
-import { db } from "../db/index";
-import { resources } from "../db/schema";
-import { uploadBase64 } from "../blob";
+import { router, publicProcedure, adminProcedure } from "../trpc.js";
+import { db } from "../db/index.js";
+import { resources } from "../db/schema.js";
+import { uploadBase64 } from "../blob.js";
 
 const categorySchema = z.enum([
   "football",

@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
-import { awardPlannerPoints, PLANNER_POINTS } from "./points";
-import { liveLog, pointsHistory } from "../db/schema";
+import { awardPlannerPoints, PLANNER_POINTS } from "./points.js";
+import { liveLog, pointsHistory } from "../db/schema.js";
 
 /**
  * Minimal mock of the drizzle db that supports exactly the fluent chains

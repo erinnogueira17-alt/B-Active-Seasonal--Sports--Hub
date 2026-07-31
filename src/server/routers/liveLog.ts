@@ -1,8 +1,8 @@
 import { z } from "zod";
 import { and, desc, eq } from "drizzle-orm";
-import { router, publicProcedure, protectedProcedure } from "../trpc";
-import { db } from "../db/index";
-import { liveLog } from "../db/schema";
+import { router, publicProcedure, protectedProcedure } from "../trpc.js";
+import { db } from "../db/index.js";
+import { liveLog } from "../db/schema.js";
 
 const termSchema = z.enum(["term1", "term2", "term3", "term4"]);
 

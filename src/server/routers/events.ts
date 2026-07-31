@@ -1,8 +1,8 @@
 import { z } from "zod";
 import { asc, eq } from "drizzle-orm";
-import { router, publicProcedure, protectedProcedure } from "../trpc";
-import { db } from "../db/index";
-import { events } from "../db/schema";
+import { router, publicProcedure, protectedProcedure } from "../trpc.js";
+import { db } from "../db/index.js";
+import { events } from "../db/schema.js";
 
 const categorySchema = z.enum(["fixture", "festival", "tournament", "training"]);
 

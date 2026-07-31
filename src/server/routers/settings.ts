@@ -1,8 +1,8 @@
 import { z } from "zod";
 import { eq } from "drizzle-orm";
-import { router, publicProcedure, adminProcedure } from "../trpc";
-import { db } from "../db/index";
-import { siteSettings } from "../db/schema";
+import { router, publicProcedure, adminProcedure } from "../trpc.js";
+import { db } from "../db/index.js";
+import { siteSettings } from "../db/schema.js";
 
 const CALENDAR_KEY = "calendarVisible";
 

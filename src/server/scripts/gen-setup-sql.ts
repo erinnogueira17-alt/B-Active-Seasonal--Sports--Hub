@@ -8,7 +8,7 @@
 import { readFileSync, writeFileSync, readdirSync } from "node:fs";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
-import { TERM3_COACHES, SCHOOLS, TERM3_ALLOCATIONS } from "./seedData";
+import { TERM3_COACHES, SCHOOLS, TERM3_ALLOCATIONS } from "./seedData.js";
 
 const here = dirname(fileURLToPath(import.meta.url));
 const root = join(here, "..", "..", "..");

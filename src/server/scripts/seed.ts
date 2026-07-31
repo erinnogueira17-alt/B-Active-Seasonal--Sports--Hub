@@ -1,8 +1,8 @@
 import "dotenv/config";
 import { sql } from "drizzle-orm";
-import { db } from "../db/index";
-import { coaches, schools, allocations, liveLog, siteSettings } from "../db/schema";
-import { TERM3_COACHES, SCHOOLS, TERM3_ALLOCATIONS } from "./seedData";
+import { db } from "../db/index.js";
+import { coaches, schools, allocations, liveLog, siteSettings } from "../db/schema.js";
+import { TERM3_COACHES, SCHOOLS, TERM3_ALLOCATIONS } from "./seedData.js";
 
 async function count(table: any): Promise<number> {
   const [{ c }] = await db.select({ c: sql<number>`count(*)::int` }).from(table);
