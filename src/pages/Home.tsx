@@ -1,11 +1,16 @@
+import { useState } from "react";
 import { Link } from "wouter";
-import { Trophy, ClipboardList, BookOpen, ScrollText, Camera, Eye, EyeOff } from "lucide-react";
+import { Trophy, ClipboardList, BookOpen, ScrollText, Camera, Eye, EyeOff, ImageUp } from "lucide-react";
 import { trpc } from "../lib/trpc";
 import { useAuth } from "../lib/useAuth";
 import { useToast } from "../components/Toast";
+import { uploadToBlob } from "../lib/blobUpload";
 import { EventsCalendar } from "../components/EventsCalendar";
 import { QuickDashboard } from "../components/QuickDashboard";
 import { PageContainer } from "../components/ui";
+
+const DEFAULT_HERO =
+  "https://images.unsplash.com/photo-1461896836934-ffe607ba8211?auto=format&fit=crop&w=1600&q=60";
 
 const FEATURES = [
   { href: "/results", icon: Trophy, title: "Weekly Results", desc: "Submit and review match results across every school." },
@@ -32,20 +37,57 @@ export function Home() {
 
   const showCalendar = calendarVisible.data?.visible || isAdmin;
 
+  const heroImage = trpc.settings.getHeroImage.useQuery();
+  const [heroBusy, setHeroBusy] = useState(false);
+  const setHero = trpc.settings.setHeroImage.useMutation({
+    onSuccess: async () => { await utils.settings.getHeroImage.invalidate(); toast("Background photo updated"); },
+    onError: (e) => toast(e.message, "error"),
+  });
+  const heroUrl = heroImage.data?.url || DEFAULT_HERO;
+
+  const changeHero = async (file: File | undefined) => {
+    if (!file) return;
+    setHeroBusy(true);
+    try {
+      const { url } = await uploadToBlob("hero", file);
+      await setHero.mutateAsync({ url });
+    } catch (e: any) {
+      toast(`Upload failed: ${e?.message ?? "error"}`, "error");
+    } finally {
+      setHeroBusy(false);
+    }
+  };
+
   return (
     <div>
       {/* Hero */}
       <section className="relative overflow-hidden bg-neutral-950 text-white">
         <div
-          className="absolute inset-0 opacity-30"
+          className="absolute inset-0 opacity-40"
           style={{
-            backgroundImage:
-              "url('https://images.unsplash.com/photo-1461896836934-ffe607ba8211?auto=format&fit=crop&w=1600&q=60')",
+            backgroundImage: `url('${heroUrl}')`,
             backgroundSize: "cover",
             backgroundPosition: "center",
           }}
         />
         <div className="absolute inset-0 bg-gradient-to-t from-neutral-950 via-neutral-950/70 to-neutral-950/40" />
+
+        {isAdmin && (
+          <div className="absolute right-3 top-3 z-10 flex gap-2">
+            <label className="btn-gold cursor-pointer px-3 py-1.5 text-xs">
+              <ImageUp className="h-4 w-4" /> {heroBusy ? "Uploading…" : "Change background"}
+              <input type="file" accept="image/*" className="hidden" disabled={heroBusy}
+                onChange={(e) => changeHero(e.target.files?.[0])} />
+            </label>
+            {heroImage.data?.url && (
+              <button className="rounded-md bg-white/15 px-3 py-1.5 text-xs font-semibold text-white hover:bg-white/25"
+                disabled={heroBusy} onClick={() => setHero.mutate({ url: "" })}>
+                Reset
+              </button>
+            )}
+          </div>
+        )}
+
         <div className="relative mx-auto max-w-6xl px-4 py-20 text-left md:py-28">
           <h1 className="heading text-5xl leading-[0.95] md:text-7xl">
             <span className="text-[#f59e0b]">SEASONAL</span>
