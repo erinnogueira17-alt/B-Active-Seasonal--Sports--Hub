@@ -70,9 +70,10 @@ export function Home() {
             backgroundPosition: "center",
           }}
         />
-        {/* Very light scrim, only behind the text (left third); people stay bright */}
-        <div className="absolute inset-0 bg-gradient-to-r from-neutral-950/55 via-neutral-950/10 to-transparent" />
-        <div className="absolute inset-0 bg-gradient-to-t from-neutral-950/15 to-transparent" />
+        {/* Even darkening over the whole photo — one dial. Currently 40%. */}
+        <div className="absolute inset-0 bg-neutral-950/40" />
+        {/* A touch extra behind the text on the left for readability */}
+        <div className="absolute inset-0 bg-gradient-to-r from-neutral-950/25 to-transparent" />
 
         {isAdmin && (
           <div className="absolute right-3 top-3 z-10 flex gap-2">
