@@ -141,6 +141,13 @@ CREATE TABLE "users" (
 	CONSTRAINT "users_email_unique" UNIQUE("email")
 );
 --> statement-breakpoint
+CREATE TABLE IF NOT EXISTS "notices" (
+	"id" serial PRIMARY KEY NOT NULL,
+	"body" text NOT NULL,
+	"created_by" integer REFERENCES "users"("id"),
+	"created_at" timestamp with time zone DEFAULT now()
+);
+--> statement-breakpoint
 ALTER TABLE "events" ADD CONSTRAINT "events_created_by_users_id_fk" FOREIGN KEY ("created_by") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "gallery" ADD CONSTRAINT "gallery_uploaded_by_users_id_fk" FOREIGN KEY ("uploaded_by") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "live_log" ADD CONSTRAINT "live_log_updated_by_users_id_fk" FOREIGN KEY ("updated_by") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint

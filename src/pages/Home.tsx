@@ -63,14 +63,16 @@ export function Home() {
       {/* Hero */}
       <section className="relative overflow-hidden bg-neutral-950 text-white">
         <div
-          className="absolute inset-0 opacity-40"
+          className="absolute inset-0"
           style={{
             backgroundImage: `url('${heroUrl}')`,
             backgroundSize: "cover",
             backgroundPosition: "center",
           }}
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-neutral-950 via-neutral-950/70 to-neutral-950/40" />
+        {/* Very light scrim, only behind the text (left third); people stay bright */}
+        <div className="absolute inset-0 bg-gradient-to-r from-neutral-950/55 via-neutral-950/10 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-t from-neutral-950/15 to-transparent" />
 
         {isAdmin && (
           <div className="absolute right-3 top-3 z-10 flex gap-2">
@@ -89,12 +91,12 @@ export function Home() {
         )}
 
         <div className="relative mx-auto max-w-6xl px-4 py-20 text-left md:py-28">
-          <h1 className="heading text-5xl leading-[0.95] md:text-7xl">
+          <h1 className="heading text-5xl leading-[0.95] md:text-7xl [text-shadow:_0_2px_16px_rgba(0,0,0,0.65)]">
             <span className="text-[#f59e0b]">SEASONAL</span>
             <br />
             <span className="text-white">SPORTS HUB</span>
           </h1>
-          <p className="mt-6 max-w-2xl text-lg italic text-white/80">
+          <p className="mt-6 max-w-2xl text-lg italic text-white/90 [text-shadow:_0_1px_10px_rgba(0,0,0,0.75)]">
             “Success is no accident. It is hard work, perseverance, learning, sacrifice, and most
             of all, love of what you are doing or learning to do.” — Pelé
           </p>

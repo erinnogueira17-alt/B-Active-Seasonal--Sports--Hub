@@ -11,6 +11,7 @@ import { plannerRouter } from "./planner.js";
 import { pointsHistoryRouter } from "./pointsHistory.js";
 import { schoolsRouter } from "./schools.js";
 import { settingsRouter } from "./settings.js";
+import { noticesRouter } from "./notices.js";
 
 export const appRouter = router({
   auth: authRouter,
@@ -25,6 +26,7 @@ export const appRouter = router({
   pointsHistory: pointsHistoryRouter,
   schools: schoolsRouter,
   settings: settingsRouter,
+  notices: noticesRouter,
 });
 
 export type AppRouter = typeof appRouter;

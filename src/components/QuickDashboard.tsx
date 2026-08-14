@@ -1,60 +1,30 @@
 import { Link } from "wouter";
-import { CalendarDays, Trophy, Camera, ChevronRight, Medal } from "lucide-react";
+import { Trophy, Camera, ChevronRight, Medal } from "lucide-react";
 import { trpc } from "../lib/trpc";
-import { formatDate } from "../lib/utils";
+import { NoticeBoard } from "./NoticeBoard";
 
 /** The term currently on show in the dashboard leaderboard. Update at term rollover. */
 const CURRENT_TERM = "term3" as const;
 
-type EventRow = { id: number; title: string; date: string | Date; category: string; color?: string | null };
 type LogRow = { id: number; entityName: string; points: number };
 type Photo = { id: number; title: string | null; caption: string | null; imageUrl: string };
 
 /**
- * At-a-glance dashboard for the home page — works on desktop (3 columns) and
- * mobile (stacked). Shows the next fixtures, the top of the leaderboard and the
- * latest photos, each linking through to its full page.
+ * At-a-glance dashboard for the home page — works on desktop and mobile.
+ * Notice board across the top, then the leaderboard and latest photos.
  */
 export function QuickDashboard() {
-  const events = trpc.events.list.useQuery();
   const leaderboard = trpc.liveLog.list.useQuery({ term: CURRENT_TERM });
   const gallery = trpc.gallery.list.useQuery();
 
-  const now = new Date();
-  now.setHours(0, 0, 0, 0);
-  const upcoming = ((events.data ?? []) as EventRow[])
-    .filter((e) => new Date(e.date) >= now)
-    .slice(0, 4);
   const topCoaches = ((leaderboard.data ?? []) as LogRow[]).slice(0, 5);
   const photos = ((gallery.data ?? []) as Photo[]).slice(0, 6);
 
   return (
-    <div className="grid gap-5 lg:grid-cols-3">
-      {/* Upcoming fixtures */}
-      <Panel title="Upcoming" icon={CalendarDays} href="/" hideMore>
-        {upcoming.length === 0 ? (
-          <Empty>No upcoming events.</Empty>
-        ) : (
-          <ul className="divide-y divide-neutral-100">
-            {upcoming.map((e) => (
-              <li key={e.id} className="flex items-center gap-3 py-2.5">
-                <span
-                  className="mt-0.5 h-2.5 w-2.5 shrink-0 rounded-full"
-                  style={{ background: e.color || "#f59e0b" }}
-                />
-                <div className="min-w-0 flex-1">
-                  <p className="truncate text-sm font-medium text-neutral-800">{e.title}</p>
-                  <p className="text-xs capitalize text-neutral-500">{e.category}</p>
-                </div>
-                <span className="shrink-0 text-xs font-medium text-neutral-500">
-                  {formatDate(e.date, { month: "short", day: "numeric" })}
-                </span>
-              </li>
-            ))}
-          </ul>
-        )}
-      </Panel>
+    <div className="space-y-5">
+      <NoticeBoard />
 
+      <div className="grid gap-5 lg:grid-cols-2">
       {/* Leaderboard */}
       <Panel title="Leaderboard" icon={Trophy} href="/log">
         {topCoaches.length === 0 ? (
@@ -93,6 +63,7 @@ export function QuickDashboard() {
           </div>
         )}
       </Panel>
+      </div>
     </div>
   );
 }

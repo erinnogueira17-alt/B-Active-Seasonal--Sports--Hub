@@ -131,6 +131,14 @@ export const events = pgTable("events", {
   updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow(),
 });
 
+// ─── notices — homepage notice board (universal coach messages) ─────────
+export const notices = pgTable("notices", {
+  id: serial("id").primaryKey(),
+  body: text("body").notNull(),
+  createdBy: integer("created_by").references(() => users.id),
+  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
+});
+
 // ─── plannerSubmissions — weekly seasonal plan URL submissions ──────────
 export const plannerSubmissions = pgTable("planner_submissions", {
   id: serial("id").primaryKey(),
