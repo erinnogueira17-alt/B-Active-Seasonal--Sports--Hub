@@ -51,21 +51,27 @@ submissions close with a "season ended" message.
 
 ## 3. Accounts, coaches & admins
 
-Everyone signs in — the login screen has two tabs, **Coach** and **Admin**.
+The login screen has two tabs, **Coach** and **Admin**.
 
-- **Coaches** create their own account (Coach → Create account) and can use all
-  coach-facing pages straight away. No approval needed.
-- **Admins** are the management team (the backend). A coach becomes an admin
-  only when an existing admin approves them.
+- **Coaches** sign in with just their **first name + surname + the shared
+  access code** (a PIN). No passwords, nothing to forget. A coach account is
+  created automatically the first time they sign in (so photo uploads stay
+  attributed).
+- **Admins** (the backend/management team) have their own **email + password**
+  logins — the secure part of the app.
 
-**Approving / adding admins** — Admin → **Team & Accounts** (the dashboard shows
-a gold banner when someone requests admin):
+**The shared coach code** is set in `src/server/lib/coachAccess.ts`:
 
-1. A coach signs in, then clicks **Request admin access** on the home page.
-2. Their request appears under **Admin access requests** — click
-   **Approve as admin**. (You can also **Make admin** on any coach directly.)
-3. To remove an admin, use **Make coach**. You can't change your own role, so
-   there's always at least one admin. **Remove** deletes a coach account.
+```ts
+export const COACH_PIN = (process.env.COACH_PIN ?? "2026").trim();
+```
+
+To change it (e.g. each year), edit `"2026"` → save → commit → push, or set a
+`COACH_PIN` environment variable in Vercel.
+
+**Adding an admin** — Admin → **Team & Accounts** → **Add admin**: enter their
+name, email and a password (share it with them). They sign in on the **Admin**
+tab. Use **Make coach** to remove admin rights (you can't change your own).
 
 > Coaches can never see the admin panel — only admins can.
 

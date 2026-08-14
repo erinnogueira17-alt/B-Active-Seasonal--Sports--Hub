@@ -16,16 +16,9 @@ const FEATURES = [
 ];
 
 export function Home() {
-  const { isAdmin, isCoach, adminRequested, refetch } = useAuth();
+  const { isAdmin } = useAuth();
   const { toast } = useToast();
   const utils = trpc.useUtils();
-  const requestAdmin = trpc.auth.requestAdmin.useMutation({
-    onSuccess: async () => {
-      await refetch();
-      toast("Admin access requested — an existing admin will review it.");
-    },
-    onError: (e) => toast(e.message, "error"),
-  });
   const calendarVisible = trpc.settings.getCalendarVisible.useQuery();
   const eventsQuery = trpc.events.list.useQuery(undefined, {
     enabled: calendarVisible.data?.visible || isAdmin,
@@ -77,26 +70,6 @@ export function Home() {
       </section>
 
       <PageContainer>
-        {/* Coach → request admin access */}
-        {isCoach && (
-          <div className="mb-8 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-neutral-200 bg-white p-4">
-            <p className="text-sm text-neutral-600">
-              Part of the management team?{" "}
-              {adminRequested ? (
-                <span className="font-medium text-[#92400e]">Your admin request is awaiting approval.</span>
-              ) : (
-                <>Request admin access to reach the backend.</>
-              )}
-            </p>
-            {!adminRequested && (
-              <button className="btn-outline" disabled={requestAdmin.isPending}
-                onClick={() => requestAdmin.mutate()}>
-                Request admin access
-              </button>
-            )}
-          </div>
-        )}
-
         {/* At-a-glance dashboard */}
         <QuickDashboard />
 

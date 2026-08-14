@@ -93,23 +93,27 @@ function getCurrentTerm() { return "term3"; }  // the active term`}</CodeBlock>
 
       <Section n={3} icon={ShieldPlus} title="Accounts, coaches & admins">
         <p>
-          Everyone signs in — the login screen has two tabs, <strong>Coach</strong> and{" "}
-          <strong>Admin</strong>. Coaches create their own account and can use all coach-facing pages straight
-          away. Admins are the management team (the backend); a coach becomes an admin only when an existing
-          admin approves them.
+          The login screen has two tabs, <strong>Coach</strong> and <strong>Admin</strong>.
         </p>
-        <p className="font-medium">Approving / adding admins — Admin → <A href="/manage-accounts">Team &amp; Accounts</A>:</p>
-        <ol className="ml-5 list-decimal space-y-1 text-neutral-700">
-          <li>A coach signs in, then clicks <strong>Request admin access</strong> on the home page.</li>
+        <ul className="ml-5 list-disc space-y-1 text-neutral-700">
           <li>
-            Their request appears under <strong>Admin access requests</strong> — click{" "}
-            <strong>Approve as admin</strong>. (You can also <strong>Make admin</strong> on any coach directly.)
+            <strong>Coaches</strong> sign in with just their <strong>first name + surname + the shared access
+            code</strong> (a PIN) — no passwords. Their account is created automatically on first sign-in.
           </li>
           <li>
-            To remove an admin, use <strong>Make coach</strong>. You can't change your own role, so there's
-            always at least one admin. <strong>Remove</strong> deletes a coach account.
+            <strong>Admins</strong> (the backend team) have their own <strong>email + password</strong> logins.
           </li>
-        </ol>
+        </ul>
+        <p>
+          The shared coach code lives in <Code>src/server/lib/coachAccess.ts</Code> (<Code>COACH_PIN</Code>) —
+          change <Code>"2026"</Code> to rotate it, or set a <Code>COACH_PIN</Code> environment variable in
+          Vercel.
+        </p>
+        <p>
+          <strong>Adding an admin:</strong> Admin → <A href="/manage-accounts">Team &amp; Accounts</A> →{" "}
+          <strong>Add admin</strong> (name, email, password — share it with them). Use <strong>Make coach</strong>{" "}
+          to remove admin rights; you can't change your own.
+        </p>
         <Callout>Coaches can never see the admin panel — only admins can.</Callout>
       </Section>
 

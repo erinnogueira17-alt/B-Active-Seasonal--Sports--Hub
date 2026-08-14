@@ -1,6 +1,5 @@
 import { Link } from "wouter";
-import { Users, Trophy, ScrollText, ClipboardList, BookOpen, Calendar, TrendingUp, Camera, LifeBuoy, UserCheck, Clock } from "lucide-react";
-import { trpc } from "../lib/trpc";
+import { Users, Trophy, ScrollText, ClipboardList, BookOpen, Calendar, TrendingUp, Camera, LifeBuoy, UserCheck } from "lucide-react";
 import { useAuth } from "../lib/useAuth";
 import { AdminOnly } from "../components/Guards";
 import { PageContainer } from "../components/ui";
@@ -28,10 +27,6 @@ export function AdminDashboard() {
 
 function Inner() {
   const { user } = useAuth();
-  const usersQuery = trpc.auth.listUsers.useQuery();
-  const pendingCount = (usersQuery.data ?? []).filter(
-    (u) => u.role !== "admin" && (u as { adminRequested?: boolean }).adminRequested,
-  ).length;
 
   return (
     <PageContainer>
@@ -41,18 +36,6 @@ function Inner() {
           {user?.name ? `Signed in as ${user.name}. ` : ""}Term 3 is active.
         </p>
       </div>
-
-      {pendingCount > 0 && (
-        <Link
-          href="/manage-accounts"
-          className="mb-6 flex items-center gap-3 rounded-xl border border-[#f59e0b] bg-[#f59e0b]/10 p-4 text-[#92400e] hover:bg-[#f59e0b]/20"
-        >
-          <Clock className="h-5 w-5 shrink-0" />
-          <span className="font-medium">
-            {pendingCount} admin access request{pendingCount > 1 ? "s" : ""} — review now →
-          </span>
-        </Link>
-      )}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {CARDS.map((c) => (
           <Link key={c.href} href={c.href} className="card group flex flex-col items-center gap-3 p-6 text-center transition-shadow hover:shadow-md">
