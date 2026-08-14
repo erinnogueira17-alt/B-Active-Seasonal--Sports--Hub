@@ -31,6 +31,11 @@ export function Log() {
     onSuccess: () => { invalidate(); toast("Entry removed"); },
     onError: (e) => toast(e.message, "error"),
   });
+  const [cotw, setCotw] = useState("");
+  const coachOfWeek = trpc.liveLog.coachOfWeek.useMutation({
+    onSuccess: () => { invalidate(); setCotw(""); toast("Coach of the Week — +3 points awarded"); },
+    onError: (e) => toast(e.message, "error"),
+  });
 
   const termLabel = TERMS.find((t) => t.value === term)?.label ?? term;
 
@@ -57,6 +62,30 @@ export function Log() {
               onClick={() => upsert.mutate({ entityName: name, points: Number(points), term })}
             >
               Save
+            </button>
+          </div>
+        </div>
+      )}
+
+      {isAdmin && (
+        <div className="card mb-6 border-l-4 border-[#f59e0b] p-4">
+          <div className="mb-3 heading text-sm text-neutral-500">⭐ Coach of the Week — adds +3 points</div>
+          <div className="flex flex-wrap items-end gap-3">
+            <div className="flex-1 min-w-[180px]">
+              <label className="label">Choose a coach</label>
+              <select className="input" value={cotw} onChange={(e) => setCotw(e.target.value)}>
+                <option value="">Select a coach…</option>
+                {(query.data ?? []).map((row) => (
+                  <option key={row.id} value={row.entityName}>{row.entityName}</option>
+                ))}
+              </select>
+            </div>
+            <button
+              className="btn-gold"
+              disabled={!cotw || coachOfWeek.isPending}
+              onClick={() => { if (confirm(`Award Coach of the Week (+3) to ${cotw}?`)) coachOfWeek.mutate({ entityName: cotw, term }); }}
+            >
+              Award +3
             </button>
           </div>
         </div>

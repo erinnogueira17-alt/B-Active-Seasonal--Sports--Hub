@@ -44,8 +44,9 @@ submissions close with a "season ended" message.
   This list feeds the results form dropdown.
 - **Allocations:** the Allocations page create/delete. (Bulk-loading a whole
   term is easiest via a SQL paste — see §6.)
-- **Leaderboard:** Log page (admin) — add/adjust points; planner submissions
-  auto-award +2 on a coach's first submission each week.
+- **Leaderboard:** Log page (admin). Points come from: planner submissions
+  (auto **+2** on a coach's first submission each week), **Coach of the Week**
+  (pick a coach → **+3**), and manual add/adjust. Each term has its own log.
 
 ---
 

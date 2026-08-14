@@ -85,8 +85,9 @@ function getCurrentTerm() { return "term3"; }  // the active term`}</CodeBlock>
             easiest via a SQL paste — see §6.)
           </li>
           <li>
-            <strong>Leaderboard:</strong> Log page (admin) — add/adjust points; planner submissions auto-award
-            +2 on a coach's first submission each week.
+            <strong>Leaderboard:</strong> Log page (admin). Points come from planner submissions (auto{" "}
+            <strong>+2</strong> on the first submission each week), <strong>Coach of the Week</strong> (pick a
+            coach → <strong>+3</strong>), and manual add/adjust. Each term has its own log.
           </li>
         </ul>
       </Section>

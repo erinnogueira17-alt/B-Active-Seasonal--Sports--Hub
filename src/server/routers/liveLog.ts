@@ -1,13 +1,16 @@
 import { z } from "zod";
 import { and, desc, eq } from "drizzle-orm";
-import { router, publicProcedure, protectedProcedure } from "../trpc.js";
+import { router, publicProcedure, adminProcedure } from "../trpc.js";
 import { db } from "../db/index.js";
-import { liveLog } from "../db/schema.js";
+import { liveLog, pointsHistory } from "../db/schema.js";
 
 const termSchema = z.enum(["term1", "term2", "term3", "term4"]);
 
+/** Points awarded when an admin names a Coach of the Week. */
+export const COACH_OF_WEEK_POINTS = 3;
+
 export const liveLogRouter = router({
-  upsert: protectedProcedure
+  upsert: adminProcedure
     .input(
       z.object({
         entityName: z.string().min(1).max(255),
@@ -62,7 +65,7 @@ export const liveLogRouter = router({
         .orderBy(desc(liveLog.points));
     }),
 
-  update: protectedProcedure
+  update: adminProcedure
     .input(
       z.object({
         id: z.number(),
@@ -83,7 +86,46 @@ export const liveLogRouter = router({
       return { success: true };
     }),
 
-  delete: protectedProcedure
+  // Name a Coach of the Week for the term → +3 points (with an audit record).
+  coachOfWeek: adminProcedure
+    .input(z.object({ entityName: z.string().min(1).max(255), term: termSchema.default("term3") }))
+    .mutation(async ({ input, ctx }) => {
+      const existing = await db
+        .select()
+        .from(liveLog)
+        .where(and(eq(liveLog.entityName, input.entityName), eq(liveLog.term, input.term)))
+        .limit(1);
+
+      if (existing[0]) {
+        await db
+          .update(liveLog)
+          .set({
+            points: existing[0].points + COACH_OF_WEEK_POINTS,
+            updatedBy: ctx.user.id,
+            updatedAt: new Date(),
+          })
+          .where(eq(liveLog.id, existing[0].id));
+      } else {
+        await db.insert(liveLog).values({
+          entityName: input.entityName,
+          points: COACH_OF_WEEK_POINTS,
+          term: input.term,
+          updatedBy: ctx.user.id,
+        });
+      }
+
+      await db.insert(pointsHistory).values({
+        coachName: input.entityName,
+        term: input.term,
+        points: COACH_OF_WEEK_POINTS,
+        reason: "coach_of_week",
+        weekDate: new Date(),
+      });
+
+      return { success: true };
+    }),
+
+  delete: adminProcedure
     .input(z.object({ id: z.number() }))
     .mutation(async ({ input }) => {
       await db.delete(liveLog).where(eq(liveLog.id, input.id));
