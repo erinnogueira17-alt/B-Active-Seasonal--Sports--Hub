@@ -4,7 +4,7 @@ import { sportEmoji, type Term } from "../lib/utils";
 import { EmptyState, Loading, PageContainer, PageHeader, TermTabs } from "../components/ui";
 
 export function Allocations() {
-  const [term, setTerm] = useState<Term>("term3");
+  const [term, setTerm] = useState<Term>("term4");
   const query = trpc.allocations.listByTerm.useQuery({ term });
 
   const grouped = useMemo(() => {

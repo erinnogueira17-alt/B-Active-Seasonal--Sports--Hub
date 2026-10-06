@@ -12,11 +12,11 @@ import { Loading, PageContainer, PageHeader } from "../components/ui";
 // Master switch: set to false at the end of a season, true at the start.
 const SEASON_OPEN = true;
 // Earliest date the weekly window can open. Update at the start of each term.
-const TERM_START = new Date(2026, 6, 1); // 1 July 2026
+const TERM_START = new Date(2026, 9, 11); // Sun 11 Oct 2026 — Term 4 start (first window = week of Mon 12 Oct)
 
 // The active term for planner submissions. Update at the start of each term.
 function getCurrentTerm(): Term {
-  return "term3";
+  return "term4";
 }
 
 export function SubmitPlanner() {

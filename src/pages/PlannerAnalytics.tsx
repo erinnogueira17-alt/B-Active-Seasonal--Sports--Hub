@@ -20,7 +20,7 @@ export function PlannerAnalytics() {
 }
 
 function Inner() {
-  const [term, setTerm] = useState<Term>("term3");
+  const [term, setTerm] = useState<Term>("term4");
   const mondays = useMemo(() => allMondaysForAnalytics().reverse(), []); // newest first
   const [week, setWeek] = useState(() => isoDate(mondayOf(new Date())));
 

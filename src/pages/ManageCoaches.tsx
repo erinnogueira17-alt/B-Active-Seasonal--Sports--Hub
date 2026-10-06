@@ -15,7 +15,7 @@ export function ManageCoaches() {
 }
 
 function Inner() {
-  const [term, setTerm] = useState<Term>("term3");
+  const [term, setTerm] = useState<Term>("term4");
   const utils = trpc.useUtils();
   const { toast } = useToast();
   const coaches = trpc.coaches.list.useQuery({ term });

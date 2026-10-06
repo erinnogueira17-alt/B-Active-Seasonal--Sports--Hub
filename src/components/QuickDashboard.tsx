@@ -4,7 +4,7 @@ import { trpc } from "../lib/trpc";
 import { NoticeBoard } from "./NoticeBoard";
 
 /** The term currently on show in the dashboard leaderboard. Update at term rollover. */
-const CURRENT_TERM = "term3" as const;
+const CURRENT_TERM = "term4" as const;
 
 type LogRow = { id: number; entityName: string; points: number };
 type Photo = { id: number; title: string | null; caption: string | null; imageUrl: string };

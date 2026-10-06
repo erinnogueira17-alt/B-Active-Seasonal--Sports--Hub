@@ -7,7 +7,7 @@ import { TERMS, type Term } from "../lib/utils";
 import { EmptyState, Loading, Modal, PageContainer, PageHeader, TermTabs } from "../components/ui";
 
 export function Log() {
-  const [term, setTerm] = useState<Term>("term3");
+  const [term, setTerm] = useState<Term>("term4");
   const { isAdmin } = useAuth();
   const { toast } = useToast();
   const utils = trpc.useUtils();

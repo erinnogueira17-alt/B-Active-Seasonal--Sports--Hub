@@ -33,7 +33,7 @@ function Inner() {
       <div className="mb-8 rounded-xl bg-neutral-950 p-8 text-white">
         <h1 className="heading text-3xl">Welcome to the Admin Panel</h1>
         <p className="mt-2 text-white/70">
-          {user?.name ? `Signed in as ${user.name}. ` : ""}Term 3 is active.
+          {user?.name ? `Signed in as ${user.name}. ` : ""}Term 4 is active.
         </p>
       </div>
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
