@@ -1,5 +1,5 @@
 -- ============================================================
--- Term 4 coach allocations (66 rows), from the "2026 Term 4" sheet.
+-- Term 4 coach allocations (62 rows), from the "2026 Term 4" sheet.
 -- Re-runnable: clears existing Term 4 allocations first.
 -- ============================================================
 
@@ -67,11 +67,7 @@ INSERT INTO allocations (coach_name, team, school, term) VALUES
   ('Breyton', 'Table Tennis', 'Sandton Sinai', 'term4'),
   ('Jerome', 'Cricket', 'Sandton Sinai', 'term4'),
   ('Jerome', 'Rugby', 'Sandton Sinai', 'term4'),
-  ('Nhlanhla', 'Rugby', 'Sandton Sinai', 'term4'),
-  ('Akimi', '[Needs Sport Assignment]', 'Rallim', 'term4'),
-  ('Shalom', '[Needs Sport Assignment]', 'Rallim', 'term4'),
-  ('Dylan', '[Needs Sport Assignment]', 'Rallim', 'term4'),
-  ('Sergio', '[Needs Sport Assignment]', 'Rallim', 'term4');
+  ('Nhlanhla', 'Rugby', 'Sandton Sinai', 'term4');
 
 -- Make sure every school is in the results dropdown list (skips existing):
 INSERT INTO schools (name)
@@ -85,7 +81,6 @@ SELECT v.name FROM (VALUES
   ('Crawford Sandton'),
   ('Generation Schools Taroko'),
   ('Lion Pride Academy'),
-  ('Sandton Sinai'),
-  ('Rallim')
+  ('Sandton Sinai')
 ) AS v(name)
 WHERE NOT EXISTS (SELECT 1 FROM schools s WHERE s.name = v.name);
