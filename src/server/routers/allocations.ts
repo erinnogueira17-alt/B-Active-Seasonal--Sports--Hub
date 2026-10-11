@@ -1,15 +1,14 @@
 import { z } from "zod";
 import { eq } from "drizzle-orm";
-import { router, publicProcedure } from "../trpc.js";
+import { router, publicProcedure, adminProcedure } from "../trpc.js";
 import { db } from "../db/index.js";
 import { allocations } from "../db/schema.js";
 
 const termSchema = z.enum(["term1", "term2", "term3", "term4"]);
 
 export const allocationsRouter = router({
-  // NOTE: create/delete are intentionally public for ease of bulk data loading.
-  // See SECURITY NOTES — restrict to admin for a production hardening pass.
-  create: publicProcedure
+  // Admins add/remove allocations from the Allocations page.
+  create: adminProcedure
     .input(
       z.object({
         coachName: z.string().min(1).max(255),
@@ -19,7 +18,15 @@ export const allocationsRouter = router({
       }),
     )
     .mutation(async ({ input }) => {
-      const inserted = await db.insert(allocations).values(input).returning();
+      const inserted = await db
+        .insert(allocations)
+        .values({
+          coachName: input.coachName.trim(),
+          team: input.team.trim(),
+          school: input.school.trim(),
+          term: input.term,
+        })
+        .returning();
       return inserted[0];
     }),
 
@@ -32,7 +39,7 @@ export const allocationsRouter = router({
         .where(eq(allocations.term, input.term));
     }),
 
-  delete: publicProcedure
+  delete: adminProcedure
     .input(z.object({ id: z.number() }))
     .mutation(async ({ input }) => {
       await db.delete(allocations).where(eq(allocations.id, input.id));
