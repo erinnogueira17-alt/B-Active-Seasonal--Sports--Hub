@@ -42,6 +42,15 @@ export function allMondaysForAnalytics(weeksAhead = 4): Date[] {
   return mondaysBetween(start, end);
 }
 
+/**
+ * Local calendar date as YYYY-MM-DD. Uses local date parts (NOT toISOString,
+ * which is UTC) so week keys line up with how dates are displayed and how
+ * planner weeks are stored — otherwise, in timezones ahead of UTC, a local
+ * midnight Monday becomes the previous day in UTC and week-matching breaks.
+ */
 export function isoDate(d: Date): string {
-  return d.toISOString().slice(0, 10);
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  return `${y}-${m}-${day}`;
 }

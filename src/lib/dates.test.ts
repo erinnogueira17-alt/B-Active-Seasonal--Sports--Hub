@@ -54,7 +54,15 @@ describe("mondaysBetween", () => {
 });
 
 describe("isoDate", () => {
-  it("formats as YYYY-MM-DD", () => {
-    expect(isoDate(new Date(Date.UTC(2026, 6, 5)))).toBe("2026-07-05");
+  it("formats a local date as YYYY-MM-DD", () => {
+    expect(isoDate(new Date(2026, 6, 5))).toBe("2026-07-05");
+  });
+
+  it("uses local date parts, so a local-midnight Monday round-trips to the same day", () => {
+    // Regression: isoDate must agree with mondayOf (both local), otherwise
+    // planner week-matching breaks in timezones ahead of UTC.
+    const d = new Date(2026, 9, 13, 9, 30); // Tue 13 Oct 2026, 09:30 local
+    const monday = mondayOf(d); // local-midnight Mon 12 Oct
+    expect(isoDate(monday)).toBe("2026-10-12");
   });
 });
