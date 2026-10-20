@@ -5,7 +5,7 @@
  *  - Hashed build assets (/assets/*) & images: cache-first (safe — names are content-hashed).
  *  - API calls (/api/*): always go to the network, never cached.
  */
-const VERSION = "v1";
+const VERSION = "v2";
 const SHELL = `shell-${VERSION}`;
 const ASSETS = `assets-${VERSION}`;
 

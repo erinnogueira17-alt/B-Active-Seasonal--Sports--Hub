@@ -16,6 +16,18 @@ function dayRange(d: Date): [Date, Date] {
   return [start, end];
 }
 
+/**
+ * A planner "week" is stored as a local-midnight Monday, whose UTC instant
+ * depends on the submitter's timezone. When the Analytics page asks for a
+ * week, the admin's timezone can differ, so we match within ±36h of the
+ * requested instant. That absorbs any timezone skew while staying far inside
+ * the 7-day (168h) gap between weeks, so adjacent weeks never collide.
+ */
+function weekMatchRange(d: Date): [Date, Date] {
+  const ms = 36 * 60 * 60 * 1000;
+  return [new Date(d.getTime() - ms), new Date(d.getTime() + ms)];
+}
+
 export const plannerRouter = router({
   submit: publicProcedure
     .input(
@@ -80,7 +92,7 @@ export const plannerRouter = router({
   listByWeek: adminProcedure
     .input(z.object({ weekDate: z.coerce.date() }))
     .query(async ({ input }) => {
-      const [dayStart, dayEnd] = dayRange(input.weekDate);
+      const [dayStart, dayEnd] = weekMatchRange(input.weekDate);
       return db
         .select()
         .from(plannerSubmissions)
