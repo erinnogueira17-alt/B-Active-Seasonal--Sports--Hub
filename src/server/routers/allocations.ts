@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import { router, publicProcedure, adminProcedure } from "../trpc.js";
 import { db } from "../db/index.js";
 import { allocations } from "../db/schema.js";
@@ -15,6 +15,7 @@ export const allocationsRouter = router({
         team: z.string().min(1).max(255),
         school: z.string().min(1).max(255),
         term: termSchema,
+        year: z.number().int().min(2000).max(2100).default(2026),
       }),
     )
     .mutation(async ({ input }) => {
@@ -25,18 +26,19 @@ export const allocationsRouter = router({
           team: input.team.trim(),
           school: input.school.trim(),
           term: input.term,
+          year: input.year,
         })
         .returning();
       return inserted[0];
     }),
 
   listByTerm: publicProcedure
-    .input(z.object({ term: termSchema }))
+    .input(z.object({ term: termSchema, year: z.number().int().default(2026) }))
     .query(async ({ input }) => {
       return db
         .select()
         .from(allocations)
-        .where(eq(allocations.term, input.term));
+        .where(and(eq(allocations.term, input.term), eq(allocations.year, input.year)));
     }),
 
   delete: adminProcedure

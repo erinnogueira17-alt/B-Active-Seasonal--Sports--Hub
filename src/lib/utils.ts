@@ -54,6 +54,10 @@ export const TERMS = [
 
 export type Term = (typeof TERMS)[number]["value"];
 
+/** Seasons shown on Allocations, the Log and the Gallery. 2026 holds existing data; add a year here to open a new season. */
+export const SEASON_YEARS = [2026, 2027] as const;
+export type SeasonYear = (typeof SEASON_YEARS)[number];
+
 /**
  * Turns an uploaded filename into a readable label, e.g.
  * "Coach_Daniel_-_Colin_Mann_Football.jpg" → "Coach Daniel – Colin Mann Football".

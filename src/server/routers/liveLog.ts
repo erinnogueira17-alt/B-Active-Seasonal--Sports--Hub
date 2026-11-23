@@ -16,6 +16,7 @@ export const liveLogRouter = router({
         entityName: z.string().min(1).max(255),
         points: z.number().int(),
         term: termSchema.default("term3"),
+        year: z.number().int().min(2000).max(2100).default(2026),
       }),
     )
     .mutation(async ({ input, ctx }) => {
@@ -26,6 +27,7 @@ export const liveLogRouter = router({
           and(
             eq(liveLog.entityName, input.entityName),
             eq(liveLog.term, input.term),
+            eq(liveLog.year, input.year),
           ),
         )
         .limit(1);
@@ -48,6 +50,7 @@ export const liveLogRouter = router({
           entityName: input.entityName,
           points: input.points,
           term: input.term,
+          year: input.year,
           updatedBy: ctx.user.id,
         })
         .returning();
@@ -55,13 +58,14 @@ export const liveLogRouter = router({
     }),
 
   list: publicProcedure
-    .input(z.object({ term: termSchema.optional() }).optional())
+    .input(z.object({ term: termSchema.optional(), year: z.number().int().optional() }).optional())
     .query(async ({ input }) => {
       const term = input?.term ?? "term3";
+      const year = input?.year ?? 2026;
       return db
         .select()
         .from(liveLog)
-        .where(eq(liveLog.term, term))
+        .where(and(eq(liveLog.term, term), eq(liveLog.year, year)))
         .orderBy(desc(liveLog.points));
     }),
 

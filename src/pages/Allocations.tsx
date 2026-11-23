@@ -3,13 +3,14 @@ import { Plus, Trash2 } from "lucide-react";
 import { trpc } from "../lib/trpc";
 import { useAuth } from "../lib/useAuth";
 import { useToast } from "../components/Toast";
-import { sportEmoji, type Term } from "../lib/utils";
-import { EmptyState, Loading, PageContainer, PageHeader, TermTabs } from "../components/ui";
+import { SEASON_YEARS, sportEmoji, type SeasonYear, type Term } from "../lib/utils";
+import { EmptyState, Loading, PageContainer, PageHeader, TermTabs, YearTabs } from "../components/ui";
 
 export function Allocations() {
   const [term, setTerm] = useState<Term>("term4");
+  const [year, setYear] = useState<SeasonYear>(2026);
   const { isAdmin } = useAuth();
-  const query = trpc.allocations.listByTerm.useQuery({ term });
+  const query = trpc.allocations.listByTerm.useQuery({ term, year });
 
   const grouped = useMemo(() => {
     const map = new Map<string, typeof query.data>();
@@ -24,14 +25,15 @@ export function Allocations() {
   return (
     <PageContainer>
       <PageHeader title="Coach Allocations" subtitle="Who's coaching what, grouped by school." />
+      <YearTabs value={year} onChange={(y) => setYear(y as SeasonYear)} years={SEASON_YEARS} />
       <TermTabs value={term} onChange={setTerm} />
 
-      {isAdmin && <AddAllocation term={term} />}
+      {isAdmin && <AddAllocation term={term} year={year} />}
 
       {query.isLoading ? (
         <Loading />
       ) : grouped.length === 0 ? (
-        <EmptyState>No allocations for this term yet.</EmptyState>
+        <EmptyState>No allocations for {year} {term.replace("term", "Term ")} yet.</EmptyState>
       ) : (
         <div className="space-y-8">
           {grouped.map(([school, allocs]) => (
@@ -45,7 +47,7 @@ export function Allocations() {
                       <div className="font-semibold text-neutral-900">{a.team}</div>
                       <div className="text-sm text-neutral-500">{a.coachName}</div>
                     </div>
-                    {isAdmin && <DeleteAllocation id={a.id} term={term} />}
+                    {isAdmin && <DeleteAllocation id={a.id} term={term} year={year} />}
                   </div>
                 ))}
               </div>
@@ -57,7 +59,7 @@ export function Allocations() {
   );
 }
 
-function AddAllocation({ term }: { term: Term }) {
+function AddAllocation({ term, year }: { term: Term; year: number }) {
   const utils = trpc.useUtils();
   const { toast } = useToast();
   const schools = trpc.schools.list.useQuery();
@@ -67,7 +69,7 @@ function AddAllocation({ term }: { term: Term }) {
 
   const create = trpc.allocations.create.useMutation({
     onSuccess: () => {
-      utils.allocations.listByTerm.invalidate({ term });
+      utils.allocations.listByTerm.invalidate({ term, year });
       setCoachName("");
       setSport("");
       toast("Allocation added");
@@ -80,12 +82,12 @@ function AddAllocation({ term }: { term: Term }) {
 
   const submit = () => {
     if (!canAdd) return;
-    create.mutate({ coachName: coachName.trim(), team: sport.trim(), school: school.trim(), term });
+    create.mutate({ coachName: coachName.trim(), team: sport.trim(), school: school.trim(), term, year });
   };
 
   return (
     <div className="card mb-6 p-4">
-      <div className="mb-3 heading text-sm text-neutral-500">Admin — add a coach allocation ({termLabel})</div>
+      <div className="mb-3 heading text-sm text-neutral-500">Admin — add a coach allocation ({year} {termLabel})</div>
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         <input
           className="input"
@@ -118,17 +120,17 @@ function AddAllocation({ term }: { term: Term }) {
         </button>
       </div>
       <p className="mt-2 text-xs text-neutral-500">
-        Pick an existing school or type a new one. The allocation is added to <strong>{termLabel}</strong>.
+        Pick an existing school or type a new one. The allocation is added to <strong>{year} {termLabel}</strong>.
       </p>
     </div>
   );
 }
 
-function DeleteAllocation({ id, term }: { id: number; term: Term }) {
+function DeleteAllocation({ id, term, year }: { id: number; term: Term; year: number }) {
   const utils = trpc.useUtils();
   const { toast } = useToast();
   const del = trpc.allocations.delete.useMutation({
-    onSuccess: () => { utils.allocations.listByTerm.invalidate({ term }); toast("Allocation removed"); },
+    onSuccess: () => { utils.allocations.listByTerm.invalidate({ term, year }); toast("Allocation removed"); },
     onError: (e) => toast(e.message, "error"),
   });
   return (

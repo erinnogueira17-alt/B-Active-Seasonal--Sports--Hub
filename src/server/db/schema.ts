@@ -74,6 +74,7 @@ export const allocations = pgTable("allocations", {
   team: varchar("team", { length: 255 }).notNull(),
   school: varchar("school", { length: 255 }).notNull(),
   term: termEnum("term").notNull(),
+  year: integer("year").notNull().default(2026),
   createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
   updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow(),
 });
@@ -113,6 +114,7 @@ export const liveLog = pgTable("live_log", {
   points: integer("points").notNull().default(0),
   rank: integer("rank"),
   term: termEnum("term").notNull().default("term1"),
+  year: integer("year").notNull().default(2026),
   updatedBy: integer("updated_by").references(() => users.id),
   createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
   updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow(),

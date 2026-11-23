@@ -4,7 +4,7 @@ import { trpc } from "../lib/trpc";
 import { useAuth } from "../lib/useAuth";
 import { useToast } from "../components/Toast";
 import { uploadToBlob } from "../lib/blobUpload";
-import { labelFromFilename } from "../lib/utils";
+import { SEASON_YEARS, labelFromFilename } from "../lib/utils";
 import { EmptyState, Loading, PageContainer, PageHeader } from "../components/ui";
 
 type Photo = {
@@ -21,10 +21,6 @@ function photoLabel(p: Photo): string {
   return p.caption?.trim() || labelFromFilename(p.title);
 }
 
-function monthKey(d: string | Date) {
-  return new Date(d).toLocaleDateString(undefined, { month: "long", year: "numeric" });
-}
-
 function downloadImage(url: string, name: string) {
   const a = document.createElement("a");
   a.href = url;
@@ -38,15 +34,17 @@ export function Gallery() {
   const list = trpc.gallery.list.useQuery();
   const [lightbox, setLightbox] = useState<Photo | null>(null);
 
+  // One section per year, newest first. Season years always show (even when empty) so 2027 is ready for photos.
   const grouped = useMemo(() => {
-    const map = new Map<string, Photo[]>();
+    const map = new Map<number, Photo[]>();
+    for (const y of SEASON_YEARS) map.set(y, []);
     for (const p of (list.data ?? []) as Photo[]) {
-      const k = monthKey(p.createdAt);
-      const arr = map.get(k) ?? [];
+      const y = new Date(p.createdAt).getFullYear();
+      const arr = map.get(y) ?? [];
       arr.push(p);
-      map.set(k, arr);
+      map.set(y, arr);
     }
-    return Array.from(map.entries());
+    return Array.from(map.entries()).sort((a, b) => b[0] - a[0]);
   }, [list.data]);
 
   return (
@@ -67,19 +65,21 @@ export function Gallery() {
 
       {list.isLoading ? (
         <Loading />
-      ) : grouped.length === 0 ? (
-        <EmptyState>No photos yet.</EmptyState>
       ) : (
         <div className="space-y-10">
-          {grouped.map(([month, photos]) => (
-            <div key={month}>
-              <h2 className="heading mb-3 text-xl text-neutral-800">{month}</h2>
-              <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
-                {photos.map((p) => (
-                  <PhotoTile key={p.id} p={p} isAdmin={isAdmin} onOpen={() => setLightbox(p)} />
-                ))}
-              </div>
-            </div>
+          {grouped.map(([year, photos]) => (
+            <section key={year}>
+              <h2 className="heading mb-3 text-xl text-neutral-800">{year}</h2>
+              {photos.length === 0 ? (
+                <EmptyState>No photos yet for {year}.</EmptyState>
+              ) : (
+                <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
+                  {photos.map((p) => (
+                    <PhotoTile key={p.id} p={p} isAdmin={isAdmin} onOpen={() => setLightbox(p)} />
+                  ))}
+                </div>
+              )}
+            </section>
           ))}
         </div>
       )}

@@ -3,21 +3,22 @@ import { Pencil, Trash2 } from "lucide-react";
 import { trpc } from "../lib/trpc";
 import { useAuth } from "../lib/useAuth";
 import { useToast } from "../components/Toast";
-import { TERMS, type Term } from "../lib/utils";
-import { EmptyState, Loading, Modal, PageContainer, PageHeader, TermTabs } from "../components/ui";
+import { SEASON_YEARS, TERMS, type SeasonYear, type Term } from "../lib/utils";
+import { EmptyState, Loading, Modal, PageContainer, PageHeader, TermTabs, YearTabs } from "../components/ui";
 
 export function Log() {
   const [term, setTerm] = useState<Term>("term4");
+  const [year, setYear] = useState<SeasonYear>(2026);
   const { isAdmin } = useAuth();
   const { toast } = useToast();
   const utils = trpc.useUtils();
-  const query = trpc.liveLog.list.useQuery({ term });
+  const query = trpc.liveLog.list.useQuery({ term, year });
 
   const [name, setName] = useState("");
   const [points, setPoints] = useState("0");
   const [editing, setEditing] = useState<{ id: number; name: string; points: number } | null>(null);
 
-  const invalidate = () => utils.liveLog.list.invalidate({ term });
+  const invalidate = () => utils.liveLog.list.invalidate({ term, year });
 
   const upsert = trpc.liveLog.upsert.useMutation({
     onSuccess: () => { invalidate(); setName(""); setPoints("0"); toast("Leaderboard updated"); },
@@ -42,6 +43,7 @@ export function Log() {
   return (
     <PageContainer>
       <PageHeader title="Seasonal Log" subtitle="The live points leaderboard for the term." />
+      <YearTabs value={year} onChange={(y) => setYear(y as SeasonYear)} years={SEASON_YEARS} />
       <TermTabs value={term} onChange={setTerm} />
 
       {isAdmin && (
@@ -59,7 +61,7 @@ export function Log() {
             <button
               className="btn-primary"
               disabled={!name || upsert.isPending}
-              onClick={() => upsert.mutate({ entityName: name, points: Number(points), term })}
+              onClick={() => upsert.mutate({ entityName: name, points: Number(points), term, year })}
             >
               Save
             </button>
@@ -94,7 +96,7 @@ export function Log() {
       {query.isLoading ? (
         <Loading />
       ) : (query.data?.length ?? 0) === 0 ? (
-        <EmptyState>{termLabel} log is starting — check back after the first submissions.</EmptyState>
+        <EmptyState>{year} {termLabel} log is starting — check back after the first submissions.</EmptyState>
       ) : (
         <div className="card overflow-hidden">
           <table className="w-full text-left text-sm">

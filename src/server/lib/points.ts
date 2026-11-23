@@ -9,7 +9,7 @@ export const PLANNER_POINTS = 2;
 
 /**
  * Awards points for a *new* planner submission:
- *  1. find the coach's liveLog entry for the term
+ *  1. find the coach's liveLog entry for the term and season year (from weekDate)
  *  2. if found, increment points by PLANNER_POINTS
  *  3. if not found, create an entry with points = PLANNER_POINTS
  *  4. write an audit record into points_history
@@ -22,10 +22,11 @@ export async function awardPlannerPoints(
   weekDate: Date,
   db: Db = defaultDb,
 ): Promise<void> {
+  const year = weekDate.getFullYear();
   const existing = await db
     .select()
     .from(liveLog)
-    .where(and(eq(liveLog.entityName, coachName), eq(liveLog.term, term)))
+    .where(and(eq(liveLog.entityName, coachName), eq(liveLog.term, term), eq(liveLog.year, year)))
     .limit(1);
 
   if (existing[0]) {
@@ -39,7 +40,7 @@ export async function awardPlannerPoints(
   } else {
     await db
       .insert(liveLog)
-      .values({ entityName: coachName, term, points: PLANNER_POINTS });
+      .values({ entityName: coachName, term, year, points: PLANNER_POINTS });
   }
 
   await db.insert(pointsHistory).values({

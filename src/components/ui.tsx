@@ -75,6 +75,35 @@ export function TermTabs({
   );
 }
 
+export function YearTabs({
+  value,
+  onChange,
+  years,
+}: {
+  value: number;
+  onChange: (y: number) => void;
+  years: readonly number[];
+}) {
+  return (
+    <div className="mb-4 flex flex-wrap gap-2">
+      {years.map((y) => (
+        <button
+          key={y}
+          onClick={() => onChange(y)}
+          className={cn(
+            "rounded-full px-5 py-2 text-sm font-semibold transition-colors",
+            value === y
+              ? "bg-[#f59e0b] text-neutral-900"
+              : "bg-white text-neutral-600 ring-1 ring-neutral-200 hover:bg-neutral-100",
+          )}
+        >
+          {y}
+        </button>
+      ))}
+    </div>
+  );
+}
+
 export function Modal({
   open,
   onClose,
